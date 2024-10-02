@@ -10,7 +10,7 @@
 
 class Service {
  public:
-  Service(int branch_counter, int courier_counter, std::vector<int> couriers_start_position) :
+  Service(int branch_counter, int courier_counter) :
       branch_counter_(branch_counter),
       courier_counter_(courier_counter) {}
   std::vector<Courier *> getCouriers() {
