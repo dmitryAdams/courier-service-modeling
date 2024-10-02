@@ -1,0 +1,12 @@
+//
+// Created by adams on 10/2/24.
+//
+
+#ifndef COURIER_SERVICE_MODELING_FRONTEND_APP_H_
+#define COURIER_SERVICE_MODELING_FRONTEND_APP_H_
+
+class App {
+
+};
+
+#endif //COURIER_SERVICE_MODELING_FRONTEND_APP_H_
