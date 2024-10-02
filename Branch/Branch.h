@@ -6,7 +6,12 @@
 #define COURIER_SERVICE_MODELING_BRANCH_H
 
 class Branch {
+public:
+    Branch(int id) : id_(id) {}
+    int getId() { return id_; }
 
+private:
+    int id_;
 };
 
 
