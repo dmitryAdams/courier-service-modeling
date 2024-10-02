@@ -7,6 +7,7 @@
 
 #include "QMainWindow"
 #include "QTableWidget"
+#include "QPushButton"
 
 class SetTimeWindow : public QMainWindow {
  Q_OBJECT
@@ -14,6 +15,9 @@ class SetTimeWindow : public QMainWindow {
   SetTimeWindow(int office_count, int courier_count, QWidget *parent = nullptr);
  private:
   QTableWidget *table_widget_;
+  QPushButton *accept_button_;
+ private slots:
+  void accept_button_clicked();
 };
 
 #endif //COURIER_SERVICE_MODELING_FRONTEND_SETTIMEWINDOW_H_
