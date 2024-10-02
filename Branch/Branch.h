@@ -5,7 +5,6 @@
 #ifndef COURIER_SERVICE_MODELING_BRANCH_H
 #define COURIER_SERVICE_MODELING_BRANCH_H
 
-
 class Branch {
 
 };
