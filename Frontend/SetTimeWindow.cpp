@@ -71,35 +71,39 @@ void SetTimeWindow::accept_button_clicked() {
     bool next = true;
     if (number_of_empty_cells != cnt && number_of_empty_cells != 0) {
       next = false;
+      cnt = 0;
+      bool ask = true;
       for (int i = 1; i <= office_counter_; ++i) {
         for (int j = i + 1; j <= office_counter_; ++j) {
           auto item = table_widget_->item(cnt, 0);
           if ((item && item->text().isEmpty()) || !item) {
-            if (!next) {
-              QDialog dlg(this);
-              QDialogButtonBox *btn_box = new QDialogButtonBox(&dlg);
+            if (!next && ask) {
+              QDialog *dlg = new QDialog(this);
+              QDialogButtonBox *btn_box = new QDialogButtonBox(dlg);
               btn_box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
-              connect(btn_box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
-              connect(btn_box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+              connect(btn_box, &QDialogButtonBox::accepted, dlg, &QDialog::accept);
+              connect(btn_box, &QDialogButtonBox::rejected, dlg, &QDialog::reject);
 
               QFormLayout *layout = new QFormLayout();
-              QLabel *label = new QLabel(&dlg);
+              QLabel *label = new QLabel(dlg);
               label->setText(
                   "Кажется вы недозаполнили расстояние между : " + QString::number(i) + " - " + QString::number(j)
                       + "\nи возможно ряд других\nУверены, что хотитет продолжить?");
               layout->addRow(label);
               layout->addWidget(btn_box);
 
-              dlg.setLayout(layout);
+              dlg->setLayout(layout);
 
-              if (dlg.exec() == QDialog::Accepted) {
+              if (dlg->exec() == QDialog::Accepted) {
                 next = true;
               }
+              ask = false;
             } else {
               matrix_dist[i - 1][j - 1] = matrix_dist[j - 1][i - 1] = -1;
             }
           }
+          ++cnt;
         }
       }
     }
