@@ -16,6 +16,7 @@ class SetTimeWindow : public QMainWindow {
  private:
   QTableWidget *table_widget_;
   QPushButton *accept_button_;
+  int office_counter_, courier_counter_;
  private slots:
   void accept_button_clicked();
 };
