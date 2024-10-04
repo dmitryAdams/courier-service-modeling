@@ -7,30 +7,33 @@
 
 #include "../Branch//Branch.h"
 #include <string>
+#include <vector>
+#include <queue>
 
 class Courier {
 public:
-    bool isOnTheWay() { return onWay_; }
+    Courier(const std::vector<std::vector<std::pair<int, int>>>& dist, int cur) : dist_(dist), cur_(cur) {}
 
-    void setWay(Branch *from, Branch *to) {
-        from_ = from;
-        to_ = to;
-        onWay_ = true;
-    }
+    bool isOnTheWay() const;
 
-    int comingFrom() { return from_->getId(); }
+    void setWay(int from, int to);
 
-    int goingTo() { return to_->getId(); }
+    int comingFrom() const;
 
-    std::string remainingTravelTime() {
-        return "hh:mm";
-    }
+    int goingTo() const;
+
+    std::string remainingTravelTime() const;
+
+    void next(int step);
 
 private:
-    bool onWay_ = false;
-    Branch *from_ = nullptr;
-    Branch *to_ = nullptr;
-    int time = 0;
+    int from_ = -1;
+    int to_ = -1;
+    int cur_ = -1;
+    int timeToNext = 1e9;
+
+    const std::vector<std::vector<std::pair<int, int>>>& dist_;
+    std::queue<int> targets_;
 };
 
 
