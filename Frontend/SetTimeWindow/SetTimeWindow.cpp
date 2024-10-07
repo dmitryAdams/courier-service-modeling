@@ -5,31 +5,31 @@
 #include "SetTimeWindow.h"
 #include "iostream"
 #include "QMessageBox"
-#include "../Time/Time.h"
+#include "../../Time/Time.h"
 #include "QLineEdit"
 #include "QFormLayout"
 #include "QLabel"
 
 SetTimeWindow::SetTimeWindow(int office_count, int courier_count, QWidget *parent) :
     QDialog(parent),
-    table_widget_(new QTableWidget(this)),
+    table_of_average_distance_(new QTableWidget(this)),
     accept_button_(new QPushButton(this)),
     office_counter_(office_count), courier_counter_(courier_count) {
   const int row_count = office_count * (office_count - 1) / 2;
   setGeometry(0, 0, 140, 110 + 600 * row_count / 21);
-  table_widget_->setColumnCount(1);
-  table_widget_->setRowCount(row_count);
-  table_widget_->setGeometry(0, 0, 140, 700);
+  table_of_average_distance_->setColumnCount(1);
+  table_of_average_distance_->setRowCount(row_count);
+  table_of_average_distance_->setGeometry(0, 0, 140, 700);
   QStringList qsl;
   for (int i = 1; i <= office_counter_; ++i) {
     for (int j = i + 1; j <= office_counter_; ++j) {
       qsl << (QString::number(i) + " - " + QString::number(j));
     }
   }
-  table_widget_->setVerticalHeaderLabels(qsl);
+  table_of_average_distance_->setVerticalHeaderLabels(qsl);
   qsl.clear();
   qsl << "Время в пути:";
-  table_widget_->setHorizontalHeaderLabels(qsl);
+  table_of_average_distance_->setHorizontalHeaderLabels(qsl);
 
   accept_button_->setGeometry(0, 60 + 600 * row_count / 21, 140, 50);
   accept_button_->setText("Задать");
@@ -44,7 +44,7 @@ void SetTimeWindow::accept_button_clicked() {
   bool error_flag = false;
   for (int i = 1; i <= office_counter_ && !error_flag; ++i) {
     for (int j = i + 1; j <= office_counter_ && !error_flag; ++j) {
-      auto item = table_widget_->item(cnt, 0);
+      auto item = table_of_average_distance_->item(cnt, 0);
       if (item) {
         if (item->text().isEmpty()) {
           number_of_empty_cells++;
@@ -75,17 +75,17 @@ void SetTimeWindow::accept_button_clicked() {
       bool ask = true;
       for (int i = 1; i <= office_counter_; ++i) {
         for (int j = i + 1; j <= office_counter_; ++j) {
-          auto item = table_widget_->item(cnt, 0);
+          auto item = table_of_average_distance_->item(cnt, 0);
           if ((item && item->text().isEmpty()) || !item) {
             if (!next && ask) {
-              QDialog *dlg = new QDialog(this);
-              QDialogButtonBox *btn_box = new QDialogButtonBox(dlg);
+              QDialog * dlg = new QDialog(this);
+              QDialogButtonBox * btn_box = new QDialogButtonBox(dlg);
               btn_box->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
               connect(btn_box, &QDialogButtonBox::accepted, dlg, &QDialog::accept);
               connect(btn_box, &QDialogButtonBox::rejected, dlg, &QDialog::reject);
 
-              QFormLayout *layout = new QFormLayout();
+              QFormLayout * layout = new QFormLayout();
               QLabel *label = new QLabel(dlg);
               label->setText(
                   "Кажется вы недозаполнили расстояние между : " + QString::number(i) + " - " + QString::number(j)
@@ -108,9 +108,12 @@ void SetTimeWindow::accept_button_clicked() {
       }
     }
     if (next) {
-      std::cerr << "ABOBA" << std::endl;
-//      MainDispetcherWindow *win = new MainDispetcherWindow(office_counter_, office_counter_, matrix_dist, this);
-//      win->show();
+      hide();
+      emit data_entered_correctly(matrix_dist);
     }
   }
+}
+SetTimeWindow::~SetTimeWindow() {
+  delete table_of_average_distance_;
+  delete accept_button_;
 }
