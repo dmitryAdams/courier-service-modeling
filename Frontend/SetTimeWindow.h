@@ -8,8 +8,9 @@
 #include "QMainWindow"
 #include "QTableWidget"
 #include "QPushButton"
+#include "QDialog"
 
-class SetTimeWindow : public QMainWindow {
+class SetTimeWindow : public QDialog {
  Q_OBJECT
  public:
   SetTimeWindow(int office_count, int courier_count, QWidget *parent = nullptr);

@@ -7,7 +7,7 @@
 #include "QMessageBox"
 #include "SetTimeWindow.h"
 StartDialogWindow::StartDialogWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QDialog(parent),
     branch_line_edit_(new QLineEdit(this)),
     courier_line_edit_(new QLineEdit(this)),
     accept_button(new QPushButton(this)) {
@@ -45,6 +45,7 @@ void StartDialogWindow::accept_button_clicked() {
     QMessageBox::critical(this, "ошибка в вводе количества курьеров", "Неправильный формат ввода числа, 1 <= x <= 5");
   } else {
     SetTimeWindow *nextGeneratingWindow = new SetTimeWindow(office_count, courier_count, this);
+    hide();
     nextGeneratingWindow->show();
   }
 }

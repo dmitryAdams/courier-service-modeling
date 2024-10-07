@@ -9,9 +9,10 @@
 #include "QLineEdit"
 #include "QFormLayout"
 #include "QLabel"
+#include "./MainDispetcherWindow/MainDIspetcherWindow.h"
 
 SetTimeWindow::SetTimeWindow(int office_count, int courier_count, QWidget *parent) :
-    QMainWindow(parent),
+    QDialog(parent),
     table_widget_(new QTableWidget(this)),
     accept_button_(new QPushButton(this)),
     office_counter_(office_count), courier_counter_(courier_count) {
@@ -108,7 +109,9 @@ void SetTimeWindow::accept_button_clicked() {
       }
     }
     if (next) {
-      std::cerr << "gone away";
+      std::cerr << "ABOBA" << std::endl;
+      MainDispetcherWindow *win = new MainDispetcherWindow(office_counter_, office_counter_, matrix_dist, this);
+      win->show();
     }
   }
 }

@@ -8,8 +8,9 @@
 #include "QMainWindow"
 #include "QLineEdit"
 #include "QPushButton"
+#include "QDialog"
 
-class StartDialogWindow : public QMainWindow {
+class StartDialogWindow : public QDialog {
  Q_OBJECT
  public:
   StartDialogWindow(QWidget *parent = nullptr);
