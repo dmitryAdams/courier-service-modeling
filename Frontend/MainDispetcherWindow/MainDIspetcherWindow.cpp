@@ -5,6 +5,7 @@
 #include "MainDIspetcherWindow.h"
 #include "QApplication"
 #include "QScreen"
+#include "iostream"
 
 MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     QWidget(parent),
@@ -14,7 +15,10 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     set_offices_priority_button_(new QPushButton()),
     start_button_(new QPushButton()),
     main_layout_(new QGridLayout(this)),
-    button_layout_(new QBoxLayout(QBoxLayout::LeftToRight)) {
+    button_layout_(new QBoxLayout(QBoxLayout::LeftToRight)),
+    office_counter_(-1),
+    courier_counter_(-1),
+    company_size_window_(new StartDialogWindow(this)) {
 
   set_company_size_button_->setText("company");
   set_average_time_button_->setText("average");
@@ -55,14 +59,17 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
           &QPushButton::clicked,
           this,
           &MainDispetcherWindow::start_button_clicked_);
-
+  connect(company_size_window_,
+          &StartDialogWindow::data_entered_correctly,
+          this,
+          &MainDispetcherWindow::change_company_size);
   show();
   auto screen_size = QApplication::screens()[0]->size();
   setGeometry(0, 0, screen_size.width(), screen_size.height());
 
 }
 void MainDispetcherWindow::set_company_size_button_clicked_() {
-
+  company_size_window_->show();
 }
 void MainDispetcherWindow::set_average_time_button_clicked_() {
 
@@ -72,4 +79,9 @@ void MainDispetcherWindow::set_offices_priority_button_clicked_() {
 }
 void MainDispetcherWindow::start_button_clicked_() {
 
+}
+void MainDispetcherWindow::change_company_size() {
+  office_counter_ = company_size_window_->office_count();
+  courier_counter_ = company_size_window_->courier_count();
+  std::cerr << office_counter_ << ' ' << courier_counter_ << '\n';
 }

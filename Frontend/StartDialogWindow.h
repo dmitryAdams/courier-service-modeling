@@ -14,9 +14,13 @@ class StartDialogWindow : public QDialog {
  Q_OBJECT
  public:
   StartDialogWindow(QWidget *parent = nullptr);
+  int office_count();
+  int courier_count();
  private:
-  QLineEdit *branch_line_edit_, *courier_line_edit_;
+  QLineEdit *office_line_edit_, *courier_line_edit_;
   QPushButton *accept_button;
+ signals:
+  void data_entered_correctly();
  private slots:
   void accept_button_clicked();
 };

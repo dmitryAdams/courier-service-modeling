@@ -8,7 +8,7 @@
 #include "SetTimeWindow.h"
 StartDialogWindow::StartDialogWindow(QWidget *parent) :
     QDialog(parent),
-    branch_line_edit_(new QLineEdit(this)),
+    office_line_edit_(new QLineEdit(this)),
     courier_line_edit_(new QLineEdit(this)),
     accept_button(new QPushButton(this)) {
   const int window_width = 700, window_height = 170, w_pending = 10, h_pending = 20;
@@ -16,8 +16,8 @@ StartDialogWindow::StartDialogWindow(QWidget *parent) :
   const int line_edit_width = (window_width - w_pending * 3) / 2;
   const int line_edit_height = (window_height - h_pending * 3) / 2;
   {
-    branch_line_edit_->setPlaceholderText("Введите количество офисов:");
-    branch_line_edit_->setGeometry(QRect(w_pending, h_pending, line_edit_width, line_edit_height));
+    office_line_edit_->setPlaceholderText("Введите количество офисов:");
+    office_line_edit_->setGeometry(QRect(w_pending, h_pending, line_edit_width, line_edit_height));
   }
   {
     courier_line_edit_->setPlaceholderText("Введите колиечство курьеров компании:");
@@ -37,15 +37,20 @@ StartDialogWindow::StartDialogWindow(QWidget *parent) :
 }
 void StartDialogWindow::accept_button_clicked() {
   bool office_ok, courier_ok;
-  int office_count = branch_line_edit_->text().toInt(&office_ok),
+  int office_count = office_line_edit_->text().toInt(&office_ok),
       courier_count = courier_line_edit_->text().toInt(&courier_ok);
   if (!office_ok || office_count < 3 || office_count > 7) {
     QMessageBox::critical(this, "ошибка в вводе количества офисов", "Неправильный формат ввода числа, 3 <= x <= 7");
   } else if (!courier_ok || courier_count <= 0 || courier_count > 5) {
     QMessageBox::critical(this, "ошибка в вводе количества курьеров", "Неправильный формат ввода числа, 1 <= x <= 5");
   } else {
-    SetTimeWindow *nextGeneratingWindow = new SetTimeWindow(office_count, courier_count, this);
     hide();
-    nextGeneratingWindow->show();
+    emit data_entered_correctly();
   }
+}
+int StartDialogWindow::office_count() {
+  return office_line_edit_->text().toInt();
+}
+int StartDialogWindow::courier_count() {
+  return courier_line_edit_->text().toInt();
 }
