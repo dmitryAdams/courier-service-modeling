@@ -12,28 +12,11 @@
 
 class Service {
 public:
-    Service(int branchCount, int courierCount, std::vector<std::vector<int>> matrix) :
-            branchCount_(branchCount), courierCount_(courierCount), matrix_(std::move(matrix)),
-            branches_(branchCount_), couriers_(courierCount_) {
-        //Graph initialization
-        for (int i = 1; i <= branchCount_; ++i)
-            for (int j = 1; j <= branchCount_; ++j)
-                if (matrix_[i][j] != 1e9) dist_[i][j] = {j, matrix_[i][j]};
-                else dist_[i][j] = {-1, 1e9};
+    Service(int branchCount, int courierCount, std::vector<std::vector<int>> matrix); 
 
-        floyd();
+    ~Service();
 
-        //Branches initialization
-        for (int id = 1; id <= branchCount_; ++id) branches_[id - 1] = new Branch(id);
-
-        //Couriers initialization
-        for (int i = 0; i < courierCount_; ++i) couriers_[i] = new Courier(dist_, branches_[i % branchCount_]->getId());
-    }
-
-    ~Service() {
-        for (Courier *courier: couriers_) { delete courier; }
-        for (Branch *branch: branches_) { delete branch; }
-    }
+    void getRequest(int fromId, int toId);
 
     std::vector<Courier *> getCouriers();
 
