@@ -69,6 +69,7 @@ void SetTimeWindow::accept_button_clicked() {
   }
   if (!error_flag) {
     bool next = true;
+    bool not_enough_data = false;
     if (number_of_empty_cells != cnt && number_of_empty_cells != 0) {
       next = false;
       cnt = 0;
@@ -89,7 +90,7 @@ void SetTimeWindow::accept_button_clicked() {
               QLabel *label = new QLabel(dlg);
               label->setText(
                   "Кажется вы недозаполнили расстояние между : " + QString::number(i) + " - " + QString::number(j)
-                      + "\nи возможно ряд других\nУверены, что хотитет продолжить?");
+                      + "\nи возможно ряд других\nУверены, что хотитет продолжить?\n Ваши входные данные будут заполнены рандомными числами");
               layout->addRow(label);
               layout->addWidget(btn_box);
 
@@ -97,6 +98,7 @@ void SetTimeWindow::accept_button_clicked() {
 
               if (dlg->exec() == QDialog::Accepted) {
                 next = true;
+                not_enough_data = true;
               }
               ask = false;
             } else {
@@ -106,6 +108,9 @@ void SetTimeWindow::accept_button_clicked() {
           ++cnt;
         }
       }
+    }
+    if (not_enough_data) {
+      matrix_dist.assign(office_counter_, std::vector<int>(office_counter_, -1));
     }
     if (next) {
       hide();

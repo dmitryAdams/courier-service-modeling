@@ -107,6 +107,9 @@ void MainDispetcherWindow::change_company_size() {
   office_counter_ = company_size_window_->office_count();
   courier_counter_ = company_size_window_->courier_count();
 
+  matrix_.assign(office_counter_, std::vector<int>(office_counter_, -1));
+  priority_.assign(office_counter_, -1);
+
   delete set_time_window_;
   set_time_window_ = new SetTimeWindow(office_counter_, courier_counter_, this);
 
