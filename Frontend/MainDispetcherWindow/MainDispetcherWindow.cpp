@@ -7,23 +7,28 @@
 #include "QApplication"
 #include "QScreen"
 #include "QMessageBox"
+#include "math.h"
+#include "QPropertyAnimation"
 
 MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     QWidget(parent),
     logs_(new QTextBrowser()),
-    set_company_size_button_(new QPushButton()),
-    set_average_time_button_(new QPushButton()),
+    set_company_size_button_(new QPushButton),
+    set_average_time_button_(new QPushButton),
     set_offices_priority_button_(new QPushButton()),
     start_button_(new QPushButton()),
     main_layout_(new QGridLayout(this)),
     button_layout_(new QBoxLayout(QBoxLayout::LeftToRight)),
-    office_counter_(-1),
-    courier_counter_(-1),
+    office_counter_(0),
+    courier_counter_(0),
     company_size_window_(new CompanySetSizeWindow(this)),
     set_time_window_(new SetTimeWindow(0, 0, this)),
     office_priority_window_(new OfficePriorityWindow(0, this)),
     dispetcher_service_(new Service(0, 0, {})),
-    timer_(new QTimer(this)){
+    timer_(new QTimer(this)),
+    map_label_(new QLabel), office_sprite_size_(100),
+    center_of_offices_(400, 400),
+    radius_(500) {
 
   timer_->setInterval(1000);
 
@@ -44,16 +49,14 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
   button_layout_->insertWidget(2, set_offices_priority_button_);
   button_layout_->insertWidget(3, start_button_);
 
-  QLabel *map_label = new QLabel(this);
-
-  main_layout_->addWidget(map_label, 0, 0);
+  main_layout_->addWidget(map_label_, 0, 0);
   main_layout_->addWidget(logs_, 0, 1);
   main_layout_->addLayout(button_layout_, 1, 0, 1, 2);
 
-  map_label->setMinimumSize(1000, 600);
+  map_label_->setMinimumSize(1000, 600);
   QPixmap map("../sprites/map2.jpg");
-  map_label->setPixmap(map.scaled(1005, 1e9, Qt::KeepAspectRatio));
-  std::cerr << map_label->height();
+  map_label_->setPixmap(map.scaled(1005, 1e9, Qt::KeepAspectRatio));
+  std::cerr << map_label_->height();
 
   connect(set_company_size_button_,
           &QPushButton::clicked,
@@ -86,7 +89,7 @@ void MainDispetcherWindow::set_company_size_button_clicked_() {
 }
 
 void MainDispetcherWindow::set_average_time_button_clicked_() {
-  if (office_counter_ != -1) {
+  if (office_counter_ != 0) {
     connect(set_time_window_,
             &SetTimeWindow::data_entered_correctly,
             this,
@@ -98,7 +101,7 @@ void MainDispetcherWindow::set_average_time_button_clicked_() {
 }
 
 void MainDispetcherWindow::set_offices_priority_button_clicked_() {
-  if (office_counter_ != -1) {
+  if (office_counter_ != 0) {
     connect(office_priority_window_,
             &OfficePriorityWindow::data_entered_correctly,
             this,
@@ -110,7 +113,7 @@ void MainDispetcherWindow::set_offices_priority_button_clicked_() {
 }
 
 void MainDispetcherWindow::start_button_clicked_() {
-  if (office_counter_ != -1) {
+  if (office_counter_ != 0) {
     delete dispetcher_service_;
     dispetcher_service_ = new Service(office_counter_, courier_counter_, matrix_);
     timer_->start();
@@ -120,6 +123,37 @@ void MainDispetcherWindow::start_button_clicked_() {
 }
 
 void MainDispetcherWindow::change_company_size() {
+  if (office_counter_ < company_size_window_->office_count()) {
+    office_sprites_labels_list_.resize(office_counter_);
+    QPixmap office_pixmap("../sprites/office.png");
+    double angle = M_PI * 2 / company_size_window_->office_count();
+    for (int i = office_counter_; i < office_sprites_labels_list_.size(); ++i) {
+      office_sprites_labels_list_[i] = new QLabel(map_label_);
+      office_sprites_labels_list_[i]->setGeometry(30, 30, 40, 40);
+      office_sprites_labels_list_[i]->setPixmap(office_pixmap.scaled(40, 40, Qt::KeepAspectRatio));
+      office_sprites_labels_list_[i]->show();
+    }
+//    for (int i = 0; i < office_sprites_labels_list_.size(); ++i) {
+//      QPropertyAnimation *animation = new QPropertyAnimation(office_sprites_labels_list_[i], "geometry");
+//      animation->setDuration(500);
+//      animation->setEasingCurve(QEasingCurve::Linear);
+//      animation->setEndValue(QRectF(std::cos(angle * i) * radius_ + center_of_offices_.x(),
+//                                    std::sin(angle * i) * radius_ + center_of_offices_.y(),
+//                                    office_sprites_labels_list_[i]->width(),
+//                                    office_sprites_labels_list_[i]->height()));
+//      animation->start(QAbstractAnimation::DeleteWhenStopped);
+//    }
+  } else {
+    office_sprites_labels_list_.resize(office_counter_);
+    QPixmap office_pixmap("../sprites/office.png");
+    for (int i = 0; i < office_counter_; ++i) {
+      QLabel *cur_office_label = new QLabel(map_label_);
+      cur_office_label->setMaximumSize(40, 40);
+      cur_office_label->setGeometry(30, 30, 40, 40);
+      cur_office_label->setPixmap(office_pixmap.scaled(40, 40, Qt::KeepAspectRatio));
+      cur_office_label->show();
+    }
+  }
   office_counter_ = company_size_window_->office_count();
   courier_counter_ = company_size_window_->courier_count();
 
@@ -145,9 +179,9 @@ MainDispetcherWindow::~MainDispetcherWindow() {
   delete start_button_;
   delete set_time_window_;
   delete company_size_window_;
-  delete set_offices_priority_button_;
   delete dispetcher_service_;
   delete timer_;
+  delete map_label_;
 }
 void MainDispetcherWindow::change_office_priority(const std::vector<int> &priority) {
   priority_ = priority;

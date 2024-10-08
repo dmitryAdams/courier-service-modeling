@@ -33,6 +33,7 @@ class MainDispetcherWindow : public QWidget {
   void change_office_priority(const std::vector<int> &priority);
   void make_step();
  private:
+  int office_sprite_size_;
   CompanySetSizeWindow *company_size_window_;
   SetTimeWindow *set_time_window_;
   OfficePriorityWindow *office_priority_window_;
@@ -49,6 +50,10 @@ class MainDispetcherWindow : public QWidget {
   bool company_size_was_updated_;
   Service *dispetcher_service_;
   QTimer *timer_;
+  QLabel *map_label_;
+  QPoint center_of_offices_;
+  int radius_;
+  std::vector<QLabel *> office_sprites_labels_list_;
 };
 
 #endif //COURIER_SERVICE_MODELING_FRONTEND_MAINDISPETCHERWINDOW_MAINDISPETCHERWINDOW_H_
