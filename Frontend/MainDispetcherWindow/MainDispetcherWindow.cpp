@@ -2,10 +2,10 @@
 // Created by adams on 10/6/24.
 //
 
+#include <iostream>
 #include "MainDispetcherWindow.h"
 #include "QApplication"
 #include "QScreen"
-#include "iostream"
 #include "QMessageBox"
 
 MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
@@ -21,7 +21,11 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     courier_counter_(-1),
     company_size_window_(new CompanySetSizeWindow(this)),
     set_time_window_(new SetTimeWindow(0, 0, this)),
-    office_priority_window_(new OfficePriorityWindow(0, this)) {
+    office_priority_window_(new OfficePriorityWindow(0, this)),
+    dispetcher_service_(new Service(0, 0, {})),
+    timer_(new QTimer(this)){
+
+  timer_->setInterval(1000);
 
   set_company_size_button_->setText("company");
   set_average_time_button_->setText("average");
@@ -46,6 +50,11 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
   main_layout_->addWidget(logs_, 0, 1);
   main_layout_->addLayout(button_layout_, 1, 0, 1, 2);
 
+  map_label->setMinimumSize(1000, 600);
+  QPixmap map("../sprites/map2.jpg");
+  map_label->setPixmap(map.scaled(1005, 1e9, Qt::KeepAspectRatio));
+  std::cerr << map_label->height();
+
   connect(set_company_size_button_,
           &QPushButton::clicked,
           this,
@@ -66,7 +75,8 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
           &CompanySetSizeWindow::data_entered_correctly,
           this,
           &MainDispetcherWindow::change_company_size);
-  show();
+  connect(timer_, &QTimer::timeout, this, &MainDispetcherWindow::make_step);
+
   auto screen_size = QApplication::screens()[0]->size();
   setGeometry(0, 0, screen_size.width(), screen_size.height());
 }
@@ -100,7 +110,13 @@ void MainDispetcherWindow::set_offices_priority_button_clicked_() {
 }
 
 void MainDispetcherWindow::start_button_clicked_() {
-
+  if (office_counter_ != -1) {
+    delete dispetcher_service_;
+    dispetcher_service_ = new Service(office_counter_, courier_counter_, matrix_);
+    timer_->start();
+  } else {
+    QMessageBox::critical(this, "Ошбика", "Ой, кажется вы не задали размеры компании");
+  }
 }
 
 void MainDispetcherWindow::change_company_size() {
@@ -129,7 +145,13 @@ MainDispetcherWindow::~MainDispetcherWindow() {
   delete start_button_;
   delete set_time_window_;
   delete company_size_window_;
+  delete set_offices_priority_button_;
+  delete dispetcher_service_;
+  delete timer_;
 }
 void MainDispetcherWindow::change_office_priority(const std::vector<int> &priority) {
   priority_ = priority;
+}
+void MainDispetcherWindow::make_step() {
+  dispetcher_service_->nextStep(30);
 }

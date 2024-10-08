@@ -14,6 +14,9 @@
 #include "../CompanySetSizeWindow/CompanySetSizeWindow.h"
 #include "../SetTimeWindow/SetTimeWindow.h"
 #include "../OfficePriorityWindow/OfficePriorityWindow.h"
+#include "../../service/Service.h"
+#include "QTimer"
+#include "QPixmap"
 
 class MainDispetcherWindow : public QWidget {
  Q_OBJECT
@@ -28,6 +31,7 @@ class MainDispetcherWindow : public QWidget {
   void change_company_size();
   void change_office_distance(const std::vector<std::vector<int>> &matrix);
   void change_office_priority(const std::vector<int> &priority);
+  void make_step();
  private:
   CompanySetSizeWindow *company_size_window_;
   SetTimeWindow *set_time_window_;
@@ -43,6 +47,8 @@ class MainDispetcherWindow : public QWidget {
   std::vector<std::vector<int>> matrix_;
   std::vector<int> priority_;
   bool company_size_was_updated_;
+  Service *dispetcher_service_;
+  QTimer *timer_;
 };
 
 #endif //COURIER_SERVICE_MODELING_FRONTEND_MAINDISPETCHERWINDOW_MAINDISPETCHERWINDOW_H_
