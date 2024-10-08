@@ -10,14 +10,13 @@ Service::Service(int branchCount, int courierCount,
       courierCount_(courierCount),
       matrix_(std::move(matrix)),
       branches_(branchCount_),
-      couriers_(courierCount_) {
+      couriers_(courierCount_) ,
+      dist_(branchCount_ + 1, std::vector<std::pair<int, int>>(branchCount_ + 1, {-1, 1e9})) {
   // Graph initialization
   for (int i = 1; i <= branchCount_; ++i)
     for (int j = 1; j <= branchCount_; ++j)
       if (matrix_[i][j] != 1e9)
         dist_[i][j] = {j, matrix_[i][j]};
-      else
-        dist_[i][j] = {-1, 1e9};
 
   floyd();
 

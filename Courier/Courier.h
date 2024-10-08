@@ -14,7 +14,7 @@
 class Courier {
  public:
   Courier(const std::vector<std::vector<std::pair<int, int>>>& dist, int cur, int id)
-      : dist_(dist), cur_(cur), id_(id), timeForFree_(0) {}
+      : dist_(dist), cur_(cur), id_(id), timeForFree_(0), timeToNext_(0) {}
 
   int getId() const;
 
@@ -36,10 +36,8 @@ class Courier {
 
  private:
   int id_;
-  int from_ = -1;
-  int to_ = -1;
   int cur_ = -1;
-  int timeToNext_ = 1e9;
+  int timeToNext_;
   int timeForFree_;
   const std::vector<std::vector<std::pair<int, int>>>& dist_;
   std::queue<int> targets_;
