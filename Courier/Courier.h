@@ -5,33 +5,42 @@
 #ifndef COURIER_SERVICE_MODELING_COURIER_H
 #define COURIER_SERVICE_MODELING_COURIER_H
 
-#include "../Branch//Branch.h"
+#include <queue>
 #include <string>
+#include <vector>
+
+#include "../Branch//Branch.h"
 
 class Courier {
-public:
-    bool isOnTheWay() { return onWay_; }
+ public:
+  Courier(const std::vector<std::vector<std::pair<int, int>>>& dist, int cur, int id)
+      : dist_(dist), cur_(cur), id_(id), timeForFree_(0), timeToNext_(0) {}
 
-    void setWay(Branch *from, Branch *to) {
-        from_ = from;
-        to_ = to;
-        onWay_ = true;
-    }
+  int getId() const;
 
-    int comingFrom() { return from_->getId(); }
+  bool isOnTheWay() const;
 
-    int goingTo() { return to_->getId(); }
+  void setWay(int from, int to);
 
-    std::string remainingTravelTime() {
-        return "hh:mm";
-    }
+  int comingFrom() const;
 
-private:
-    bool onWay_ = false;
-    Branch *from_ = nullptr;
-    Branch *to_ = nullptr;
-    int time = 0;
+  int goingTo() const;
+
+  int timeForFree() const;
+
+  int getLast() const;
+
+  std::string remainingTravelTime() const;
+
+  void next(int step);
+
+ private:
+  int id_;
+  int cur_ = -1;
+  int timeToNext_;
+  int timeForFree_;
+  const std::vector<std::vector<std::pair<int, int>>>& dist_;
+  std::queue<int> targets_;
 };
 
-
-#endif //COURIER_SERVICE_MODELING_COURIER_H
+#endif  // COURIER_SERVICE_MODELING_COURIER_H
