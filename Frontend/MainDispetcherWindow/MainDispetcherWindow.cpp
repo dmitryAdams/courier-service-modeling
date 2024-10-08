@@ -27,8 +27,8 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     dispetcher_service_(new Service(0, 0, {})),
     timer_(new QTimer(this)),
     map_label_(new QLabel), office_sprite_size_(100),
-    center_of_offices_(400, 400),
-    radius_(500) {
+    center_of_offices_(400, 270),
+    radius_(270) {
 
   timer_->setInterval(1000);
 
@@ -123,35 +123,46 @@ void MainDispetcherWindow::start_button_clicked_() {
 }
 
 void MainDispetcherWindow::change_company_size() {
+  QPixmap office_pixmap("../sprites/office.png");
   if (office_counter_ < company_size_window_->office_count()) {
-    office_sprites_labels_list_.resize(office_counter_);
-    QPixmap office_pixmap("../sprites/office.png");
+    office_sprites_labels_list_.resize(company_size_window_->office_count());
     double angle = M_PI * 2 / company_size_window_->office_count();
     for (int i = office_counter_; i < office_sprites_labels_list_.size(); ++i) {
       office_sprites_labels_list_[i] = new QLabel(map_label_);
-      office_sprites_labels_list_[i]->setGeometry(30, 30, 40, 40);
-      office_sprites_labels_list_[i]->setPixmap(office_pixmap.scaled(40, 40, Qt::KeepAspectRatio));
+      office_sprites_labels_list_[i]->setGeometry(center_of_offices_.x(),
+                                                  center_of_offices_.y(),
+                                                  office_sprite_size_,
+                                                  office_sprite_size_);
+      office_sprites_labels_list_[i]->setPixmap(office_pixmap.scaled(office_sprite_size_,
+                                                                     office_sprite_size_,
+                                                                     Qt::KeepAspectRatio));
       office_sprites_labels_list_[i]->show();
     }
-//    for (int i = 0; i < office_sprites_labels_list_.size(); ++i) {
-//      QPropertyAnimation *animation = new QPropertyAnimation(office_sprites_labels_list_[i], "geometry");
-//      animation->setDuration(500);
-//      animation->setEasingCurve(QEasingCurve::Linear);
-//      animation->setEndValue(QRectF(std::cos(angle * i) * radius_ + center_of_offices_.x(),
-//                                    std::sin(angle * i) * radius_ + center_of_offices_.y(),
-//                                    office_sprites_labels_list_[i]->width(),
-//                                    office_sprites_labels_list_[i]->height()));
-//      animation->start(QAbstractAnimation::DeleteWhenStopped);
-//    }
+    for (int i = 0; i < office_sprites_labels_list_.size(); ++i) {
+      QPropertyAnimation *animation = new QPropertyAnimation(office_sprites_labels_list_[i], "geometry");
+      animation->setDuration(500);
+      animation->setEasingCurve(QEasingCurve::Linear);
+      animation->setEndValue(QRectF(std::cos(angle * i) * radius_ + center_of_offices_.x(),
+                                    std::sin(angle * i) * radius_ + center_of_offices_.y(),
+                                    office_sprite_size_,
+                                    office_sprite_size_));
+      animation->start(QAbstractAnimation::DeleteWhenStopped);
+    }
   } else {
-    office_sprites_labels_list_.resize(office_counter_);
-    QPixmap office_pixmap("../sprites/office.png");
-    for (int i = 0; i < office_counter_; ++i) {
-      QLabel *cur_office_label = new QLabel(map_label_);
-      cur_office_label->setMaximumSize(40, 40);
-      cur_office_label->setGeometry(30, 30, 40, 40);
-      cur_office_label->setPixmap(office_pixmap.scaled(40, 40, Qt::KeepAspectRatio));
-      cur_office_label->show();
+    for (int i = office_counter_ - 1; i >= company_size_window_->office_count(); --i) {
+      delete office_sprites_labels_list_[i];
+    }
+    office_sprites_labels_list_.resize(company_size_window_->office_count());
+    double angle = M_PI * 2 / company_size_window_->office_count();
+    for (int i = 0; i < office_sprites_labels_list_.size(); ++i) {
+      QPropertyAnimation *animation = new QPropertyAnimation(office_sprites_labels_list_[i], "geometry");
+      animation->setDuration(500);
+      animation->setEasingCurve(QEasingCurve::Linear);
+      animation->setEndValue(QRectF(std::cos(angle * i) * radius_ + center_of_offices_.x(),
+                                    std::sin(angle * i) * radius_ + center_of_offices_.y(),
+                                    office_sprite_size_,
+                                    office_sprite_size_));
+      animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
   }
   office_counter_ = company_size_window_->office_count();
