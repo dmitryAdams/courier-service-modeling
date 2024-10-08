@@ -33,7 +33,9 @@ void Courier::setWay(int from, int to) {
     if (targets_.empty()) {
         timeToNext_ = dist_[cur_][dist_[cur_][from].first].second;
         timeForFree_ = dist_[cur_][from].second - timeToNext_;
-    } else timeForFree_ += dist_[targets_.back()][from].second;
+    } else {
+        timeForFree_ += dist_[targets_.back()][from].second;
+    }
     targets_.push(from);
     timeForFree_ += dist_[from][to].second;
     targets_.push(to);
