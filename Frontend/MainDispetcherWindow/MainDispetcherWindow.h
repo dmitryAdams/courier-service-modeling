@@ -13,12 +13,13 @@
 #include "QLabel"
 #include "../CompanySetSizeWindow/CompanySetSizeWindow.h"
 #include "../SetTimeWindow/SetTimeWindow.h"
+#include "../OfficePriorityWindow/OfficePriorityWindow.h"
 
 class MainDispetcherWindow : public QWidget {
  Q_OBJECT
  public:
   MainDispetcherWindow(QWidget *parent = nullptr);
- ~MainDispetcherWindow();
+  ~MainDispetcherWindow();
  private slots:
   void set_company_size_button_clicked_();
   void set_average_time_button_clicked_();
@@ -26,9 +27,11 @@ class MainDispetcherWindow : public QWidget {
   void start_button_clicked_();
   void change_company_size();
   void change_office_distance(const std::vector<std::vector<int>> &matrix);
+  void change_office_priority(const std::vector<int> &priority);
  private:
   CompanySetSizeWindow *company_size_window_;
   SetTimeWindow *set_time_window_;
+  OfficePriorityWindow *office_priority_window_;
   QTextBrowser *logs_;
   QPushButton *set_company_size_button_,
       *set_average_time_button_,
@@ -38,6 +41,7 @@ class MainDispetcherWindow : public QWidget {
   QGridLayout *main_layout_;
   QBoxLayout *button_layout_;
   std::vector<std::vector<int>> matrix_;
+  std::vector<int> priority_;
   bool company_size_was_updated_;
 };
 
