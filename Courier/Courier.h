@@ -43,6 +43,8 @@ class Courier {
 
   int getNextTime() const;
 
+  void clearTargets();
+
   std::string remainingTravelTime() const;
 
   std::vector<Event> next(int step);

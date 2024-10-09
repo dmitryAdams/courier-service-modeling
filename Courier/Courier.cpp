@@ -86,3 +86,7 @@ std::vector<Event> Courier::next(int step) {
     std::cout << id_ << " on " << cur_ << std::endl;
     return visited;
 }
+
+void Courier::clearTargets() {
+    while (!targets_.empty()) targets_.pop();
+}
