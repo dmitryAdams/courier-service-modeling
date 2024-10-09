@@ -10,6 +10,10 @@ bool Courier::isOnTheWay() const { return !targets_.empty(); }
 
 int Courier::comingFrom() const { return cur_; }
 
+int Courier::getTotalTime() const { return totalTime_; }
+
+int Courier::getTotalFreeTime() const { return freeTime_; }
+
 int Courier::goingTo() const {
     if (targets_.empty()) return cur_;
     return dist_[cur_][targets_.front()].first;
@@ -52,6 +56,9 @@ void Courier::next(int step) {
             std::cout << id_ << " going to next target " << targets_.front() << " throw " <<
                       dist_[cur_][targets_.front()].first << std::endl;
             cur_ = dist_[cur_][targets_.front()].first;
+            if (free_) freeTime_ += timeToNext_;
+            totalTime_ += timeToNext_;
+            free_ = !free_;
             step -= timeToNext_;
             timeForFree_ -= timeToNext_;
             timeToNext_ = 0;
@@ -60,6 +67,8 @@ void Courier::next(int step) {
             timeForFree_ -= timeToNext_;
         } else {
             timeToNext_ -= step;
+            if (free_) freeTime_ += step;
+            totalTime_ += step;
             step = 0;
             std::cout << "Time to next branch: " << timeToNext_ << std::endl;
         }

@@ -3,6 +3,8 @@
 //
 
 #include "Service.h"
+#include <algorithm>
+#include <iostream>
 
 Service::Service(int branchCount, int courierCount,
                  std::vector<std::vector<int>> matrix)
@@ -11,6 +13,7 @@ Service::Service(int branchCount, int courierCount,
       matrix_(std::move(matrix)),
       branches_(branchCount_),
       couriers_(courierCount_) ,
+      generator_(branchCount_),
       dist_(branchCount_ + 1, std::vector<std::pair<int, int>>(branchCount_ + 1, {-1, 1e9})) {
   // Graph initialization
   for (int i = 1; i <= branchCount_; ++i)
@@ -27,6 +30,11 @@ Service::Service(int branchCount, int courierCount,
   for (int i = 0; i < courierCount_; ++i)
     couriers_[i] =
         new Courier(dist_, branches_[i % branchCount_]->getId(), i + 1);
+
+  // Requests generation
+  requests_.resize(1000);
+  for (int i = 0; i < 1000; ++i) requests_[i] = generator_.getRequest();
+  sort(requests_.rbegin(), requests_.rend());
 }
 
 Service::~Service() {
@@ -35,6 +43,11 @@ Service::~Service() {
 }
 
 void Service::nextStep(int step) {
+  Time_ += step;
+  while (!requests_.empty() && requests_.back().time <= Time_) {
+    getRequest(requests_.back().from, requests_.back().to);
+    requests_.pop_back();
+  }
   for (Courier* courier : couriers_) {
     courier->next(step);
   }
@@ -59,4 +72,13 @@ void Service::getRequest(int fromId, int toId) {
         }
     }
     couriers_[id - 1]->setWay(fromId, toId);
+}
+
+void Service::getStatistics() {
+  double totalTimeSum = 0;
+  for (Courier *courier: couriers_) totalTimeSum += courier->getTotalTime();
+  std::cout << totalTimeSum / courierCount_ << std::endl;
+  int totalFreeSum = 0;
+  for (Courier *courier: couriers_) totalTimeSum += courier->getTotalFreeTime();
+  std::cout << totalFreeSum << std::endl;
 }
