@@ -28,6 +28,8 @@ public:
 
     std::vector<Event> nextStep(int step);
 
+    Stat getStat();
+
 private:
     int branchCount_, courierCount_;
     int Time_ = 540;
@@ -39,7 +41,6 @@ private:
     std::vector<Request> requests_;
 
     void floyd();
-    void getStatistics();
 };
 
 #endif //COURIER_SERVICE_MODELING_SERVICE_H

@@ -78,13 +78,16 @@ void Service::getRequest(int fromId, int toId) {
     couriers_[id - 1]->setWay(fromId, toId);
 }
 
-void Service::getStatistics() {
+Stat Service::getStat() {
+    Stat res;
     double totalTimeSum = 0;
-    for (Courier *courier: couriers_) totalTimeSum += courier->getTotalTime();
-    std::cout << totalTimeSum / courierCount_ << std::endl;
-    int totalFreeSum = 0;
-    for (Courier *courier: couriers_) totalTimeSum += courier->getTotalFreeTime();
-    std::cout << totalFreeSum << std::endl;
+    res.totalFreeTime = 0;
+    for (Courier* courier : couriers_) {
+        totalTimeSum += courier->getTotalTime();
+        res.totalFreeTime += courier->getTotalFreeTime();
+    }
+    res.averageTime = totalTimeSum / courierCount_;
+    return res;
 }
 
 std::vector<Courier *> Service::getCouriers() {
