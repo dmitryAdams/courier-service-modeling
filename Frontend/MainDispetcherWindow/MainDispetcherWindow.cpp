@@ -25,7 +25,7 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     company_size_window_(new CompanySetSizeWindow(this)),
     set_time_window_(new SetTimeWindow(0, 0, this)),
     office_priority_window_(new OfficePriorityWindow(0, this)),
-    dispetcher_service_(new Service(0, 0, {})),
+    dispetcher_service_(nullptr),
     timer_(new QTimer(this)),
     map_label_(new QLabel), office_sprite_size_(100),
     center_of_offices_(400, 270),
@@ -115,7 +115,7 @@ void MainDispetcherWindow::set_offices_priority_button_clicked_() {
 
 void MainDispetcherWindow::start_button_clicked_() {
   if (office_counter_ != 0) {
-    if (timer_->isActive()){
+    if (timer_->isActive()) {
       start_button_->setText("Start");
       timer_->stop();
     } else {
@@ -175,7 +175,7 @@ void MainDispetcherWindow::change_company_size() {
   office_counter_ = company_size_window_->office_count();
   courier_counter_ = company_size_window_->courier_count();
 
-  matrix_.assign(office_counter_, std::vector<int>(office_counter_, -1));
+  matrix_.assign(office_counter_ + 1, std::vector<int>(office_counter_ + 1, 30));
   priority_.assign(office_counter_, -1);
 
   delete set_time_window_;
@@ -186,7 +186,12 @@ void MainDispetcherWindow::change_company_size() {
 }
 
 void MainDispetcherWindow::change_office_distance(const std::vector<std::vector<int>> &matrix) {
-  matrix_ = matrix;
+  matrix_.resize(matrix.size() + 1, std::vector<int>(matrix.size() + 1));
+  for (int i = 0; i < matrix.size(); ++i) {
+    for (int j = 0; j < matrix.size(); ++j) {
+      matrix_[i + 1][j + 1] = matrix[i][j];
+    }
+  }
 }
 
 MainDispetcherWindow::~MainDispetcherWindow() {
@@ -207,4 +212,5 @@ void MainDispetcherWindow::change_office_priority(const std::vector<int> &priori
 }
 void MainDispetcherWindow::make_step() {
   dispetcher_service_->nextStep(30);
+//  std::cerr << "step" << std::endl;
 }

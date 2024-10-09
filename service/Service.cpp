@@ -18,8 +18,8 @@ Service::Service(int branchCount, int courierCount,
   // Graph initialization
   for (int i = 1; i <= branchCount_; ++i)
     for (int j = 1; j <= branchCount_; ++j)
-      if (matrix_[i - 1][j - 1] != 1e9)
-        dist_[i][j] = {j, matrix_[i - 1][j - 1]};
+      if (matrix_[i][j] != 1e9)
+        dist_[i][j] = {j, matrix_[i][j]};
 
   floyd();
 
