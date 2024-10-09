@@ -38,9 +38,9 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
 
   timer_->setInterval(30);
 
-  set_company_size_button_->setText("company");
-  set_average_time_button_->setText("average");
-  set_offices_priority_button_->setText("priority");
+  set_company_size_button_->setText("Задать размер компании");
+  set_average_time_button_->setText("Задать среднее расстояние");
+  set_offices_priority_button_->setText("Задать \"размеры\" офисов");
   start_button_->setText("start");
 
   const int mnHeight = 50;
@@ -190,6 +190,7 @@ void MainDispetcherWindow::change_company_size() {
       courier_sprites_labels_list_[i]->setPixmap(courier_pixmap.scaled(office_sprite_size_ * 0.66,
                                                                        office_sprite_size_ * 0.66,
                                                                        Qt::KeepAspectRatio));
+      courier_sprites_labels_list_[i]->setGeometry(-1000, -1000, office_sprite_size_ * 0.66, office_sprite_size_ * 0.66);
       courier_sprites_labels_list_[i]->show();
     }
   } else {
