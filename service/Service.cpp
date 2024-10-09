@@ -45,7 +45,7 @@ Service::~Service() {
 std::vector<Event> Service::nextStep(int step) {
     if (Time_ + step > 1080) {
         for (Courier* courier : couriers_) courier->clearTargets();
-        return std::vector<Event>();
+        return std::vector<Event>(1, {0, 0, 1000, 0});
     }
     Time_ += step;
     std::vector<Event> res;
