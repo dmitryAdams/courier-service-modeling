@@ -14,6 +14,10 @@ int Courier::getTotalTime() const { return totalTime_; }
 
 int Courier::getTotalFreeTime() const { return freeTime_; }
 
+int Courier::getNextTime() const {
+    return timeForNext_;
+}
+
 int Courier::goingTo() const {
     if (targets_.empty()) return cur_;
     return dist_[cur_][targets_.front()].first;
@@ -45,17 +49,19 @@ void Courier::setWay(int from, int to) {
     targets_.push(to);
 }
 
-void Courier::next(int step) {
+std::vector<int> Courier::next(int step) {
     std::cout << id_ << " on " << cur_ << std::endl;
+    std::vector<int> visited;
     if (targets_.empty()) {
         std::cout << "No targets" << std::endl;
-        return;
+        return visited;
     }
     while (!targets_.empty() && step > 0) {
         if (timeToNext_ <= step) {
             std::cout << id_ << " going to next target " << targets_.front() << " throw " <<
                       dist_[cur_][targets_.front()].first << std::endl;
             cur_ = dist_[cur_][targets_.front()].first;
+            visited.push_back(cur_);
             if (free_) freeTime_ += timeToNext_;
             totalTime_ += timeToNext_;
             free_ = !free_;
@@ -74,4 +80,5 @@ void Courier::next(int step) {
         }
     }
     std::cout << id_ << " on " << cur_ << std::endl;
+    return visited;
 }
