@@ -12,6 +12,7 @@
 #include "QPropertyAnimation"
 #include "QVector2D"
 #include "../../Time/Time.h"
+#include "../../Events/AbstacstEvent/AbsractEvent.h"
 
 MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     QWidget(parent),
@@ -245,42 +246,14 @@ void MainDispetcherWindow::change_office_priority(const std::vector<int> &priori
   priority_ = priority;
 }
 void MainDispetcherWindow::make_step() {
-  auto log_messages = dispetcher_service_->nextStep(minutes_per_step);
-  if (log_messages.size() == 1 && log_messages[0].branchId == 1000){
-    timer_->stop();
-    logs_->append("===Рабочий день закончен===");
-  } else {
-    auto couriers = dispetcher_service_->getCouriers();
-    for (int i = 0; i < couriers.size(); ++i) {
-      auto courier = couriers[i];
-      if (courier->isOnTheWay()) {
-        if (prev_from_for_courier_[i] != courier->comingFrom()) {
-          QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
-          animation->setDuration(time_for_animation_);
-          animation->setEasingCurve(QEasingCurve::Linear);
-          animation->setEndValue(QRectF(office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
-                                        office_sprites_labels_list_[courier->comingFrom() - 1]->y(),
-                                        courier_sprites_labels_list_[i]->width(),
-                                        courier_sprites_labels_list_[i]->height()));
-          animation->start(QAbstractAnimation::DeleteWhenStopped);
-          prev_from_for_courier_[i] = courier->comingFrom();
-        } else {
-          ++debug_cnt_;
-          QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
-                            - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
-                        office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
-                            - office_sprites_labels_list_[courier->comingFrom() - 1]->y());
-          vec *= std::min(1.0, minutes_per_step * 1.0 / matrix_[courier->comingFrom()][courier->goingTo()]);
-          QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
-          animation->setDuration(time_for_animation_);
-          animation->setEasingCurve(QEasingCurve::Linear);
-          animation->setEndValue(QRectF(courier_sprites_labels_list_[i]->x() + vec.x(),
-                                        courier_sprites_labels_list_[i]->y() + vec.y(),
-                                        courier_sprites_labels_list_[i]->width(),
-                                        courier_sprites_labels_list_[i]->height()));
-          animation->start(QAbstractAnimation::DeleteWhenStopped);
-        }
-      } else {
+  dispetcher_service_->nextStep(1);
+  //тут ошибка, потому что сюда надо передавать логи из строки выше
+  std::vector<AbstractEvent *> log_messages = dispetcher_service_->nextStep(1);
+  auto couriers = dispetcher_service_->getCouriers();
+  for (int i = 0; i < couriers.size(); ++i) {
+    auto courier = couriers[i];
+    if (courier->isOnTheWay()) {
+      if (prev_from_for_courier_[i] != courier->comingFrom()) {
         QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
         animation->setDuration(time_for_animation_);
         animation->setEasingCurve(QEasingCurve::Linear);
@@ -289,20 +262,39 @@ void MainDispetcherWindow::make_step() {
                                       courier_sprites_labels_list_[i]->width(),
                                       courier_sprites_labels_list_[i]->height()));
         animation->start(QAbstractAnimation::DeleteWhenStopped);
-      }
-    }
-    for (auto message : log_messages) {
-      if (message.isOut) {
-        logs_->append(
-            "Курьер #" + QString::number(message.courierId) + " вышел из офиса #" + QString::number(message.branchId)
-                + " в " +
-                QString::fromStdString(Time(message.time).getStringTime()));
+        prev_from_for_courier_[i] = courier->comingFrom();
       } else {
-        logs_->append(
-            "Курьер #" + QString::number(message.courierId) + " пришел в офис #" + QString::number(message.branchId)
-                + " в " +
-                QString::fromStdString(Time(message.time).getStringTime()));
+        ++debug_cnt_;
+        QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
+                          - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                      office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
+                          - office_sprites_labels_list_[courier->comingFrom() - 1]->y());
+        vec *= std::min(1.0, minutes_per_step * 1.0 / matrix_[courier->comingFrom()][courier->goingTo()]);
+        QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+        animation->setDuration(time_for_animation_);
+        animation->setEasingCurve(QEasingCurve::Linear);
+        animation->setEndValue(QRectF(courier_sprites_labels_list_[i]->x() + vec.x(),
+                                      courier_sprites_labels_list_[i]->y() + vec.y(),
+                                      courier_sprites_labels_list_[i]->width(),
+                                      courier_sprites_labels_list_[i]->height()));
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
       }
+    } else {
+      QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+      animation->setDuration(time_for_animation_);
+      animation->setEasingCurve(QEasingCurve::Linear);
+      animation->setEndValue(QRectF(office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                                    office_sprites_labels_list_[courier->comingFrom() - 1]->y(),
+                                    courier_sprites_labels_list_[i]->width(),
+                                    courier_sprites_labels_list_[i]->height()));
+      animation->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+  }
+  for (auto message : log_messages) {
+    logs_->append(QString::fromStdString(message->messageOfEvent()));
+    if (message->isLastEvent()) {
+      timer_->stop();
+      start_button_->setText("Старт");
     }
   }
 }
