@@ -11,6 +11,11 @@
 #include "../Generator/Generator.h"
 #include "vector"
 
+struct Stat {
+    double averageTime;
+    int totalFreeTime;
+};
+
 class Service {
 public:
     Service(int branchCount, int courierCount, std::vector<std::vector<int>> matrix);
