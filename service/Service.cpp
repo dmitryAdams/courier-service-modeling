@@ -43,14 +43,14 @@ Service::~Service() {
 }
 
 std::vector<Event> Service::nextStep(int step) {
-    if (Time_ + step > 1080) {
+    if (requests_.empty()) {
         for (Courier* courier : couriers_) courier->clearTargets();
         return std::vector<Event>(1, {0, 0, 1000, 0});
     }
     Time_ += step;
     std::vector<Event> res;
     while (!requests_.empty() && requests_.back().time <= Time_) {
-        getRequest(requests_.back().from, requests_.back().to);
+        if (requests_.back().time + step <= 1080) getRequest(requests_.back().from, requests_.back().to);
         requests_.pop_back();
     }
     for (Courier *courier: couriers_) {
