@@ -139,6 +139,7 @@ void MainDispetcherWindow::start_button_clicked_() {
 }
 
 void MainDispetcherWindow::change_company_size() {
+  logs_->clear();
   QPixmap office_pixmap("../sprites/office.png");
   QPixmap courier_pixmap("../sprites/courier.png");
   if (office_counter_ < company_size_window_->office_count()) {
@@ -282,7 +283,6 @@ void MainDispetcherWindow::make_step() {
       animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
   }
-  //ПОЧЕМУ ПРИВАТНЫЙ МЕТОД??????????????????????????????
   for (auto message : log_messages) {
     if (message.isOut) {
       logs_->append(
@@ -296,5 +296,4 @@ void MainDispetcherWindow::make_step() {
               QString::fromStdString(Time(message.time).getStringTime()));
     }
   }
-  std::cerr << "step" << std::endl;
 }
