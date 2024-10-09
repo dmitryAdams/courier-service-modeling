@@ -191,7 +191,10 @@ void MainDispetcherWindow::change_company_size() {
       courier_sprites_labels_list_[i]->setPixmap(courier_pixmap.scaled(office_sprite_size_ * 0.66,
                                                                        office_sprite_size_ * 0.66,
                                                                        Qt::KeepAspectRatio));
-      courier_sprites_labels_list_[i]->setGeometry(-1000, -1000, office_sprite_size_ * 0.66, office_sprite_size_ * 0.66);
+      courier_sprites_labels_list_[i]->setGeometry(-1000,
+                                                   -1000,
+                                                   office_sprite_size_ * 0.66,
+                                                   office_sprite_size_ * 0.66);
       courier_sprites_labels_list_[i]->show();
     }
   } else {
@@ -236,6 +239,7 @@ MainDispetcherWindow::~MainDispetcherWindow() {
   delete timer_;
   delete map_label_;
   for (auto i : office_sprites_labels_list_) delete i;
+  for (auto i : courier_sprites_labels_list_) delete i;
 }
 void MainDispetcherWindow::change_office_priority(const std::vector<int> &priority) {
   priority_ = priority;
@@ -286,7 +290,7 @@ void MainDispetcherWindow::make_step() {
   for (auto message : log_messages) {
     if (message.isOut) {
       logs_->append(
-          "Курьер #" + QString::number(message.courierId) + " вышел из офиса#" + QString::number(message.branchId)
+          "Курьер #" + QString::number(message.courierId) + " вышел из офиса #" + QString::number(message.branchId)
               + " в " +
               QString::fromStdString(Time(message.time).getStringTime()));
     } else {

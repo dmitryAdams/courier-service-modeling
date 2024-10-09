@@ -59,6 +59,19 @@ void SetTimeWindow::accept_button_clicked() {
             error_flag = true;
             break;
           }
+          if (dist.getIntTime() > 8 * 60) {
+            QMessageBox::critical(this,
+                                  "Ошибка заполнения времени",
+                                  "Путь из офиса в офис не может занимать более 8 часов за рабочий день)");
+            error_flag = true;
+            break;
+          } else if (dist.getIntTime() == 0){
+            QMessageBox::critical(this,
+                                  "Ошибка заполнения времени",
+                                  "Курьеры не умеют телепортироваться)");
+            error_flag = true;
+            break;
+          }
           matrix_dist[i - 1][j - 1] = matrix_dist[j - 1][i - 1] = dist.getIntTime();
         }
       } else {
@@ -110,7 +123,7 @@ void SetTimeWindow::accept_button_clicked() {
       }
     }
     if (not_enough_data) {
-      matrix_dist.assign(office_counter_, std::vector<int>(office_counter_, -1));
+      matrix_dist.assign(office_counter_ + 1, std::vector<int>(office_counter_ + 1, 60));
     }
     if (next) {
       hide();

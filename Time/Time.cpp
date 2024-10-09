@@ -15,7 +15,7 @@ Time operator+(Time a, const Time &b) {
 }
 
 std::string Time::getStringTime() const {
-  return std::to_string(t_ / 60) + ":" + std::to_string(t_ % 60);
+  return (t_ / 60 < 10 ? "0" : "") + std::to_string(t_ / 60) + ":" + (t_ % 60 < 10 ? "0" : "") + std::to_string(t_ % 60);
 }
 
 Time::Time(int minutes) : t_(minutes) {}
