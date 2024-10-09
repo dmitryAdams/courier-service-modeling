@@ -30,6 +30,10 @@ class Courier {
 
   int getLast() const;
 
+  int getTotalTime() const;
+
+  int getTotalFreeTime() const;
+
   std::string remainingTravelTime() const;
 
   void next(int step);
@@ -41,6 +45,9 @@ class Courier {
   int timeForFree_;
   const std::vector<std::vector<std::pair<int, int>>>& dist_;
   std::queue<int> targets_;
+  bool free_ = 1;
+  int freeTime_ = 0;
+  int totalTime_ = 0;
 };
 
 #endif  // COURIER_SERVICE_MODELING_COURIER_H

@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "../Courier/Courier.h"
+#include "../Generator/Generator.h"
 #include "vector"
 
 class Service {
@@ -24,12 +25,16 @@ public:
 
 private:
     int branchCount_, courierCount_;
+    int Time_ = 540;
+    Generator generator_;
     std::vector<std::vector<int>> matrix_;
     std::vector<std::vector<std::pair<int, int>>> dist_;
     std::vector<Courier *> couriers_;
     std::vector<Branch *> branches_;
+    std::vector<Request> requests_;
 
     void floyd();
+    void getStatistics();
 };
 
 #endif //COURIER_SERVICE_MODELING_SERVICE_H
