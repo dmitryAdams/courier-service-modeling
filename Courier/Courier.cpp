@@ -15,7 +15,7 @@ int Courier::getTotalTime() const { return totalTime_; }
 int Courier::getTotalFreeTime() const { return freeTime_; }
 
 int Courier::getNextTime() const {
-    return timeForNext_;
+    return timeToNext_;
 }
 
 int Courier::goingTo() const {

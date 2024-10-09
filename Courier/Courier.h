@@ -38,7 +38,7 @@ class Courier {
 
   std::string remainingTravelTime() const;
 
-  std::vector next(int step);
+  std::vector<int> next(int step);
 
  private:
   int id_;
