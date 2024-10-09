@@ -248,7 +248,7 @@ void MainDispetcherWindow::make_step() {
   auto log_messages = dispetcher_service_->nextStep(minutes_per_step);
   if (log_messages.size() == 1 && log_messages[0].branchId == 1000){
     timer_->stop();
-    start_button_->setText("is Over");
+    logs_->append("===Рабочий день закончен===");
   } else {
     auto couriers = dispetcher_service_->getCouriers();
     for (int i = 0; i < couriers.size(); ++i) {
