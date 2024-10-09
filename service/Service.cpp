@@ -74,11 +74,13 @@ void Service::getRequest(int fromId, int toId) {
     couriers_[id - 1]->setWay(fromId, toId);
 }
 
-void Service::getStatistics() {
+Statistics Service::getStatistics() {
+  Statistics res;
   double totalTimeSum = 0;
   for (Courier *courier: couriers_) totalTimeSum += courier->getTotalTime();
-  std::cout << totalTimeSum / courierCount_ << std::endl;
+  res.averageTimeInWork = totalTimeSum / courierCount_;
   int totalFreeSum = 0;
   for (Courier *courier: couriers_) totalTimeSum += courier->getTotalFreeTime();
-  std::cout << totalFreeSum << std::endl;
+  res.totalFreeTime = totalFreeSum;
+  return res;
 }

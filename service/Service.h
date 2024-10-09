@@ -11,6 +11,11 @@
 #include "../Generator/Generator.h"
 #include "vector"
 
+struct Statistics {
+  int totalFreeTime;
+  long double averageTimeInWork;
+};
+
 class Service {
 public:
     Service(int branchCount, int courierCount, std::vector<std::vector<int>> matrix);
@@ -34,7 +39,7 @@ private:
     std::vector<Request> requests_;
 
     void floyd();
-    void getStatistics();
+    Statistics getStatistics();
 };
 
 #endif //COURIER_SERVICE_MODELING_SERVICE_H
