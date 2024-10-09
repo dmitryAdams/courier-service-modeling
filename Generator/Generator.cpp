@@ -11,7 +11,7 @@ bool operator<(const Request& lhs, const Request& rhs) {
     return lhs.time < rhs.time;
 }
 
-Generator::Generator(int branchCount) : gen_(rd_()), d_(810, 90) {
+Generator::Generator(int branchCount) : gen_(rd_()), d_(810, 75) {
     srand(time(0));
     for (int i = 1; i <= branchCount; ++i) {
         int cnt = rand() % 10;
@@ -20,7 +20,7 @@ Generator::Generator(int branchCount) : gen_(rd_()), d_(810, 90) {
 }
 
 int Generator::getTime() {
-    return std::round(d_(gen_));
+    return fmax(540, fmin(1080, std::round(d_(gen_))));
 }
 
 Request Generator::getRequest() {
