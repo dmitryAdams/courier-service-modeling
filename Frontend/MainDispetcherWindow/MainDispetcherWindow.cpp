@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <numeric>
 #include "MainDispetcherWindow.h"
 #include "QApplication"
 #include "QScreen"
@@ -193,6 +194,7 @@ MainDispetcherWindow::~MainDispetcherWindow() {
   delete dispetcher_service_;
   delete timer_;
   delete map_label_;
+  for (auto i : office_sprites_labels_list_) delete i;
 }
 void MainDispetcherWindow::change_office_priority(const std::vector<int> &priority) {
   priority_ = priority;
