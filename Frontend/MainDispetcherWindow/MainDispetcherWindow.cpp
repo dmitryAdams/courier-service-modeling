@@ -115,9 +115,15 @@ void MainDispetcherWindow::set_offices_priority_button_clicked_() {
 
 void MainDispetcherWindow::start_button_clicked_() {
   if (office_counter_ != 0) {
-    delete dispetcher_service_;
-    dispetcher_service_ = new Service(office_counter_, courier_counter_, matrix_);
-    timer_->start();
+    if (timer_->isActive()){
+      start_button_->setText("Start");
+      timer_->stop();
+    } else {
+      delete dispetcher_service_;
+      dispetcher_service_ = new Service(office_counter_, courier_counter_, matrix_);
+      timer_->start();
+      start_button_->setText("Stop");
+    }
   } else {
     QMessageBox::critical(this, "Ошбика", "Ой, кажется вы не задали размеры компании");
   }
