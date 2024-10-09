@@ -49,7 +49,7 @@ void Courier::setWay(int from, int to) {
     targets_.push(to);
 }
 
-std::vector Courier::next(int step) {
+std::vector<int> Courier::next(int step) {
     std::cout << id_ << " on " << cur_ << std::endl;
     std::vector<int> visited;
     if (targets_.empty()) {
