@@ -31,9 +31,11 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     map_label_(new QLabel), office_sprite_size_(100),
     center_of_offices_(400, 270),
     radius_(270),
-    debug_cnt_(0){
+    debug_cnt_(0),
+    minutes_per_step(1),
+    time_for_animation_(10) {
 
-  timer_->setInterval(1000);
+  timer_->setInterval(30);
 
   set_company_size_button_->setText("company");
   set_average_time_button_->setText("average");
@@ -123,6 +125,10 @@ void MainDispetcherWindow::start_button_clicked_() {
     } else {
       delete dispetcher_service_;
       dispetcher_service_ = new Service(office_counter_, courier_counter_, matrix_);
+      auto couriers = dispetcher_service_->getCouriers();
+      for (int i = 0; i < courier_counter_; ++i) {
+        prev_from_for_courier_[i] = couriers[i]->comingFrom();
+      }
       timer_->start();
       start_button_->setText("Stop");
     }
@@ -194,6 +200,8 @@ void MainDispetcherWindow::change_company_size() {
   office_counter_ = company_size_window_->office_count();
   courier_counter_ = company_size_window_->courier_count();
 
+  prev_from_for_courier_.resize(courier_counter_);
+
   matrix_.assign(office_counter_ + 1, std::vector<int>(office_counter_ + 1, 60));
   priority_.assign(office_counter_, -1);
 
@@ -230,28 +238,40 @@ void MainDispetcherWindow::change_office_priority(const std::vector<int> &priori
   priority_ = priority;
 }
 void MainDispetcherWindow::make_step() {
-  dispetcher_service_->nextStep(30);
+  dispetcher_service_->nextStep(minutes_per_step);
   auto couriers = dispetcher_service_->getCouriers();
   for (int i = 0; i < couriers.size(); ++i) {
     auto courier = couriers[i];
     if (courier->isOnTheWay()) {
-      ++debug_cnt_;
-      QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
-                        - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
-                    office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
-                        - office_sprites_labels_list_[courier->comingFrom() - 1]->y());
-      vec *= std::min(1.0, 30.0 / matrix_[courier->comingFrom()][courier->goingTo()]);
-      QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
-      animation->setDuration(500);
-      animation->setEasingCurve(QEasingCurve::Linear);
-      animation->setEndValue(QRectF(courier_sprites_labels_list_[i]->x() + vec.x(),
-                                    courier_sprites_labels_list_[i]->y() + vec.y(),
-                                    courier_sprites_labels_list_[i]->width(),
-                                    courier_sprites_labels_list_[i]->height()));
-      animation->start(QAbstractAnimation::DeleteWhenStopped);
+      if (prev_from_for_courier_[i] != courier->comingFrom()) {
+        QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+        animation->setDuration(time_for_animation_);
+        animation->setEasingCurve(QEasingCurve::Linear);
+        animation->setEndValue(QRectF(office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                                      office_sprites_labels_list_[courier->comingFrom() - 1]->y(),
+                                      courier_sprites_labels_list_[i]->width(),
+                                      courier_sprites_labels_list_[i]->height()));
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
+        prev_from_for_courier_[i] = courier->comingFrom();
+      } else {
+        ++debug_cnt_;
+        QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
+                          - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                      office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
+                          - office_sprites_labels_list_[courier->comingFrom() - 1]->y());
+        vec *= std::min(1.0, minutes_per_step * 1.0 / matrix_[courier->comingFrom()][courier->goingTo()]);
+        QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+        animation->setDuration(time_for_animation_);
+        animation->setEasingCurve(QEasingCurve::Linear);
+        animation->setEndValue(QRectF(courier_sprites_labels_list_[i]->x() + vec.x(),
+                                      courier_sprites_labels_list_[i]->y() + vec.y(),
+                                      courier_sprites_labels_list_[i]->width(),
+                                      courier_sprites_labels_list_[i]->height()));
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
+      }
     } else {
       QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
-      animation->setDuration(500);
+      animation->setDuration(time_for_animation_);
       animation->setEasingCurve(QEasingCurve::Linear);
       animation->setEndValue(QRectF(office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
                                     office_sprites_labels_list_[courier->comingFrom() - 1]->y(),
