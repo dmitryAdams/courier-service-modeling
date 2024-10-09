@@ -52,7 +52,8 @@ class MainDispetcherWindow : public QWidget {
   QTimer *timer_;
   QLabel *map_label_;
   QPoint center_of_offices_;
-  int radius_;
+  int radius_, minutes_per_step, time_to_sleep_;
+  int debug_cnt_;
   std::vector<QLabel *> office_sprites_labels_list_;
   std::vector<QLabel *> courier_sprites_labels_list_;
 };

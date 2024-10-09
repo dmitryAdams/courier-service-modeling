@@ -30,7 +30,8 @@ MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     timer_(new QTimer(this)),
     map_label_(new QLabel), office_sprite_size_(100),
     center_of_offices_(400, 270),
-    radius_(270) {
+    radius_(270),
+    debug_cnt_(0){
 
   timer_->setInterval(1000);
 
@@ -228,13 +229,13 @@ MainDispetcherWindow::~MainDispetcherWindow() {
 void MainDispetcherWindow::change_office_priority(const std::vector<int> &priority) {
   priority_ = priority;
 }
-//int cnt = 0;
 void MainDispetcherWindow::make_step() {
+  dispetcher_service_->nextStep(30);
   auto couriers = dispetcher_service_->getCouriers();
   for (int i = 0; i < couriers.size(); ++i) {
     auto courier = couriers[i];
     if (courier->isOnTheWay()) {
-//      ++cnt;
+      ++debug_cnt_;
       QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
                         - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
                     office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
@@ -259,6 +260,5 @@ void MainDispetcherWindow::make_step() {
       animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
   }
-  dispetcher_service_->nextStep(30);
 //  std::cerr << "step" << std::endl;
 }
