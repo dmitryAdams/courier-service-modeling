@@ -49,23 +49,27 @@ void Courier::setWay(int from, int to) {
     targets_.push(to);
 }
 
-std::vector<int> Courier::next(int step) {
+std::vector<Event> Courier::next(int step) {
+    curTime_ += step;
     std::cout << id_ << " on " << cur_ << std::endl;
-    std::vector<int> visited;
+    std::vector<Event> visited;
     if (targets_.empty()) {
         std::cout << "No targets" << std::endl;
         return visited;
     }
     while (!targets_.empty() && step > 0) {
+        if (timeToNext_ == dist_[cur_][dist_[cur_][targets_.front()].first].second) {
+            visited.push_back({id_, 1, cur_, curTime_ - step});
+        }
         if (timeToNext_ <= step) {
             std::cout << id_ << " going to next target " << targets_.front() << " throw " <<
                       dist_[cur_][targets_.front()].first << std::endl;
             cur_ = dist_[cur_][targets_.front()].first;
-            visited.push_back(cur_);
             if (free_) freeTime_ += timeToNext_;
             totalTime_ += timeToNext_;
             free_ = !free_;
             step -= timeToNext_;
+            visited.push_back({id_, 0, cur_, curTime_ - step});
             timeForFree_ -= timeToNext_;
             timeToNext_ = 0;
             if (cur_ == targets_.front()) targets_.pop();

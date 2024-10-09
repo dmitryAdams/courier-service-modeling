@@ -21,7 +21,7 @@ public:
 
     std::vector<Courier *> getCouriers();
 
-    void nextStep(int step);
+    std::vector<Event> nextStep(int step);
 
 private:
     int branchCount_, courierCount_;

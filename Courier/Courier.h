@@ -11,6 +11,13 @@
 
 #include "../Branch//Branch.h"
 
+struct Event {
+    int courierId;
+    bool isOut;
+    int branchId;
+    int time;
+};
+
 class Courier {
  public:
   Courier(const std::vector<std::vector<std::pair<int, int>>>& dist, int cur, int id)
@@ -38,7 +45,7 @@ class Courier {
 
   std::string remainingTravelTime() const;
 
-  std::vector<int> next(int step);
+  std::vector<Event> next(int step);
 
  private:
   int id_;
@@ -50,6 +57,7 @@ class Courier {
   bool free_ = 1;
   int freeTime_ = 0;
   int totalTime_ = 0;
+  int curTime_ = 540;
 };
 
 #endif  // COURIER_SERVICE_MODELING_COURIER_H
