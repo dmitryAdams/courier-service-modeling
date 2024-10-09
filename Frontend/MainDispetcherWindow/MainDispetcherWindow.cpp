@@ -11,6 +11,7 @@
 #include "math.h"
 #include "QPropertyAnimation"
 #include "QVector2D"
+#include "../../Time/Time.h"
 
 MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     QWidget(parent),
@@ -238,7 +239,7 @@ void MainDispetcherWindow::change_office_priority(const std::vector<int> &priori
   priority_ = priority;
 }
 void MainDispetcherWindow::make_step() {
-  dispetcher_service_->nextStep(minutes_per_step);
+  auto log_messages = dispetcher_service_->nextStep(minutes_per_step);
   auto couriers = dispetcher_service_->getCouriers();
   for (int i = 0; i < couriers.size(); ++i) {
     auto courier = couriers[i];
@@ -280,5 +281,19 @@ void MainDispetcherWindow::make_step() {
       animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
   }
-//  std::cerr << "step" << std::endl;
+  //ПОЧЕМУ ПРИВАТНЫЙ МЕТОД??????????????????????????????
+  for (auto message : log_messages) {
+    if (message.isOut) {
+      logs_->append(
+          "Курьер #" + QString::number(message.courierId) + " вышел из офиса#" + QString::number(message.branchId)
+              + " в " +
+              QString::fromStdString(Time(message.time).getStringTime()));
+    } else {
+      logs_->append(
+          "Курьер #" + QString::number(message.courierId) + " пришел в офис #" + QString::number(message.branchId)
+              + " в " +
+              QString::fromStdString(Time(message.time).getStringTime()));
+    }
+  }
+  std::cerr << "step" << std::endl;
 }
