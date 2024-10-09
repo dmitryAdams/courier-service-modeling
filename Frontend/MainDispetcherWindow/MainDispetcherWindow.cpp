@@ -246,11 +246,41 @@ void MainDispetcherWindow::change_office_priority(const std::vector<int> &priori
 }
 void MainDispetcherWindow::make_step() {
   auto log_messages = dispetcher_service_->nextStep(minutes_per_step);
-  auto couriers = dispetcher_service_->getCouriers();
-  for (int i = 0; i < couriers.size(); ++i) {
-    auto courier = couriers[i];
-    if (courier->isOnTheWay()) {
-      if (prev_from_for_courier_[i] != courier->comingFrom()) {
+  if (log_messages.size() == 1 && log_messages[0].branchId == 1000){
+    timer_->stop();
+    start_button_->setText("is Over");
+  } else {
+    auto couriers = dispetcher_service_->getCouriers();
+    for (int i = 0; i < couriers.size(); ++i) {
+      auto courier = couriers[i];
+      if (courier->isOnTheWay()) {
+        if (prev_from_for_courier_[i] != courier->comingFrom()) {
+          QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+          animation->setDuration(time_for_animation_);
+          animation->setEasingCurve(QEasingCurve::Linear);
+          animation->setEndValue(QRectF(office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                                        office_sprites_labels_list_[courier->comingFrom() - 1]->y(),
+                                        courier_sprites_labels_list_[i]->width(),
+                                        courier_sprites_labels_list_[i]->height()));
+          animation->start(QAbstractAnimation::DeleteWhenStopped);
+          prev_from_for_courier_[i] = courier->comingFrom();
+        } else {
+          ++debug_cnt_;
+          QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
+                            - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                        office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
+                            - office_sprites_labels_list_[courier->comingFrom() - 1]->y());
+          vec *= std::min(1.0, minutes_per_step * 1.0 / matrix_[courier->comingFrom()][courier->goingTo()]);
+          QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+          animation->setDuration(time_for_animation_);
+          animation->setEasingCurve(QEasingCurve::Linear);
+          animation->setEndValue(QRectF(courier_sprites_labels_list_[i]->x() + vec.x(),
+                                        courier_sprites_labels_list_[i]->y() + vec.y(),
+                                        courier_sprites_labels_list_[i]->width(),
+                                        courier_sprites_labels_list_[i]->height()));
+          animation->start(QAbstractAnimation::DeleteWhenStopped);
+        }
+      } else {
         QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
         animation->setDuration(time_for_animation_);
         animation->setEasingCurve(QEasingCurve::Linear);
@@ -259,45 +289,20 @@ void MainDispetcherWindow::make_step() {
                                       courier_sprites_labels_list_[i]->width(),
                                       courier_sprites_labels_list_[i]->height()));
         animation->start(QAbstractAnimation::DeleteWhenStopped);
-        prev_from_for_courier_[i] = courier->comingFrom();
-      } else {
-        ++debug_cnt_;
-        QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
-                          - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
-                      office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
-                          - office_sprites_labels_list_[courier->comingFrom() - 1]->y());
-        vec *= std::min(1.0, minutes_per_step * 1.0 / matrix_[courier->comingFrom()][courier->goingTo()]);
-        QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
-        animation->setDuration(time_for_animation_);
-        animation->setEasingCurve(QEasingCurve::Linear);
-        animation->setEndValue(QRectF(courier_sprites_labels_list_[i]->x() + vec.x(),
-                                      courier_sprites_labels_list_[i]->y() + vec.y(),
-                                      courier_sprites_labels_list_[i]->width(),
-                                      courier_sprites_labels_list_[i]->height()));
-        animation->start(QAbstractAnimation::DeleteWhenStopped);
       }
-    } else {
-      QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
-      animation->setDuration(time_for_animation_);
-      animation->setEasingCurve(QEasingCurve::Linear);
-      animation->setEndValue(QRectF(office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
-                                    office_sprites_labels_list_[courier->comingFrom() - 1]->y(),
-                                    courier_sprites_labels_list_[i]->width(),
-                                    courier_sprites_labels_list_[i]->height()));
-      animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
-  }
-  for (auto message : log_messages) {
-    if (message.isOut) {
-      logs_->append(
-          "Курьер #" + QString::number(message.courierId) + " вышел из офиса #" + QString::number(message.branchId)
-              + " в " +
-              QString::fromStdString(Time(message.time).getStringTime()));
-    } else {
-      logs_->append(
-          "Курьер #" + QString::number(message.courierId) + " пришел в офис #" + QString::number(message.branchId)
-              + " в " +
-              QString::fromStdString(Time(message.time).getStringTime()));
+    for (auto message : log_messages) {
+      if (message.isOut) {
+        logs_->append(
+            "Курьер #" + QString::number(message.courierId) + " вышел из офиса #" + QString::number(message.branchId)
+                + " в " +
+                QString::fromStdString(Time(message.time).getStringTime()));
+      } else {
+        logs_->append(
+            "Курьер #" + QString::number(message.courierId) + " пришел в офис #" + QString::number(message.branchId)
+                + " в " +
+                QString::fromStdString(Time(message.time).getStringTime()));
+      }
     }
   }
 }
