@@ -54,6 +54,7 @@ class MainDispetcherWindow : public QWidget {
   QPoint center_of_offices_;
   int radius_;
   std::vector<QLabel *> office_sprites_labels_list_;
+  std::vector<QLabel *> courier_sprites_labels_list_;
 };
 
 #endif //COURIER_SERVICE_MODELING_FRONTEND_MAINDISPETCHERWINDOW_MAINDISPETCHERWINDOW_H_

@@ -32,8 +32,8 @@ Service::Service(int branchCount, int courierCount,
         new Courier(dist_, branches_[i % branchCount_]->getId(), i + 1);
 
   // Requests generation
-  requests_.resize(1000);
-  for (int i = 0; i < 1000; ++i) requests_[i] = generator_.getRequest();
+  requests_.resize(50);
+  for (int i = 0; i < 50; ++i) requests_[i] = generator_.getRequest();
   sort(requests_.rbegin(), requests_.rend());
 }
 
@@ -81,4 +81,7 @@ void Service::getStatistics() {
   int totalFreeSum = 0;
   for (Courier *courier: couriers_) totalTimeSum += courier->getTotalFreeTime();
   std::cout << totalFreeSum << std::endl;
+}
+std::vector<Courier *> Service::getCouriers() {
+  return couriers_;
 }

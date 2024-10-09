@@ -10,6 +10,7 @@
 #include "QMessageBox"
 #include "math.h"
 #include "QPropertyAnimation"
+#include "QVector2D"
 
 MainDispetcherWindow::MainDispetcherWindow(QWidget *parent) :
     QWidget(parent),
@@ -131,6 +132,7 @@ void MainDispetcherWindow::start_button_clicked_() {
 
 void MainDispetcherWindow::change_company_size() {
   QPixmap office_pixmap("../sprites/office.png");
+  QPixmap courier_pixmap("../sprites/courier.png");
   if (office_counter_ < company_size_window_->office_count()) {
     office_sprites_labels_list_.resize(company_size_window_->office_count());
     double angle = M_PI * 2 / company_size_window_->office_count();
@@ -172,10 +174,26 @@ void MainDispetcherWindow::change_company_size() {
       animation->start(QAbstractAnimation::DeleteWhenStopped);
     }
   }
+
+  if (courier_counter_ < company_size_window_->courier_count()) {
+    courier_sprites_labels_list_.resize(company_size_window_->courier_count());
+    for (int i = courier_counter_; i < courier_sprites_labels_list_.size(); ++i) {
+      courier_sprites_labels_list_[i] = new QLabel(map_label_);
+      courier_sprites_labels_list_[i]->setPixmap(courier_pixmap.scaled(office_sprite_size_ * 0.66,
+                                                                       office_sprite_size_ * 0.66,
+                                                                       Qt::KeepAspectRatio));
+      courier_sprites_labels_list_[i]->show();
+    }
+  } else {
+    for (int i = courier_counter_ - 1; i >= courier_sprites_labels_list_.size(); --i) {
+      delete courier_sprites_labels_list_[i];
+    }
+    courier_sprites_labels_list_.resize(company_size_window_->courier_count());
+  }
   office_counter_ = company_size_window_->office_count();
   courier_counter_ = company_size_window_->courier_count();
 
-  matrix_.assign(office_counter_ + 1, std::vector<int>(office_counter_ + 1, 30));
+  matrix_.assign(office_counter_ + 1, std::vector<int>(office_counter_ + 1, 60));
   priority_.assign(office_counter_, -1);
 
   delete set_time_window_;
@@ -210,7 +228,37 @@ MainDispetcherWindow::~MainDispetcherWindow() {
 void MainDispetcherWindow::change_office_priority(const std::vector<int> &priority) {
   priority_ = priority;
 }
+//int cnt = 0;
 void MainDispetcherWindow::make_step() {
+  auto couriers = dispetcher_service_->getCouriers();
+  for (int i = 0; i < couriers.size(); ++i) {
+    auto courier = couriers[i];
+    if (courier->isOnTheWay()) {
+//      ++cnt;
+      QVector2D vec(office_sprites_labels_list_[courier->goingTo() - 1]->pos().x()
+                        - office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                    office_sprites_labels_list_[courier->goingTo() - 1]->pos().y()
+                        - office_sprites_labels_list_[courier->comingFrom() - 1]->y());
+      vec *= std::min(1.0, 30.0 / matrix_[courier->comingFrom()][courier->goingTo()]);
+      QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+      animation->setDuration(500);
+      animation->setEasingCurve(QEasingCurve::Linear);
+      animation->setEndValue(QRectF(courier_sprites_labels_list_[i]->x() + vec.x(),
+                                    courier_sprites_labels_list_[i]->y() + vec.y(),
+                                    courier_sprites_labels_list_[i]->width(),
+                                    courier_sprites_labels_list_[i]->height()));
+      animation->start(QAbstractAnimation::DeleteWhenStopped);
+    } else {
+      QPropertyAnimation *animation = new QPropertyAnimation(courier_sprites_labels_list_[i], "geometry");
+      animation->setDuration(500);
+      animation->setEasingCurve(QEasingCurve::Linear);
+      animation->setEndValue(QRectF(office_sprites_labels_list_[courier->comingFrom() - 1]->x(),
+                                    office_sprites_labels_list_[courier->comingFrom() - 1]->y(),
+                                    courier_sprites_labels_list_[i]->width(),
+                                    courier_sprites_labels_list_[i]->height()));
+      animation->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+  }
   dispetcher_service_->nextStep(30);
 //  std::cerr << "step" << std::endl;
 }
