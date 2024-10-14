@@ -45,30 +45,45 @@ void Courier::setWay(int from, int to) {
     targets_.push(to);
 }
 
-void Courier::next(int step) {
+std::vector<Event*> Courier::next(int step) {
     std::cout << id_ << " on " << cur_ << std::endl;
     if (targets_.empty()) {
         std::cout << "No targets" << std::endl;
-        return;
+        return {};
     }
+    std::vector<Event*> res;
     while (!targets_.empty() && step > 0) {
         if (timeToNext_ <= step) {
-            std::cout << id_ << " going to next target " << targets_.front() << " throw " <<
-                      dist_[cur_][targets_.front()].first << std::endl;
+            if (timeToNext_ ==
+                dist_[cur_][dist_[cur_][targets_.front()].first].second) {
+                res.push_back(new OfficeVisitEvent(0, cur_, time_));
+            }
+            std::cout << id_ << " going to next target " << targets_.front()
+                      << " throw " << dist_[cur_][targets_.front()].first
+                      << std::endl;
+            time_ += timeToNext_;
             cur_ = dist_[cur_][targets_.front()].first;
+            res.push_back(new OfficeVisitEvent(1, cur_, time_));
             if (free_) freeTime_ += timeToNext_;
             totalTime_ += timeToNext_;
             free_ = !free_;
             step -= timeToNext_;
             timeForFree_ -= timeToNext_;
             timeToNext_ = 0;
-            if (cur_ == targets_.front()) targets_.pop();
-            if (!targets_.empty()) timeToNext_ = dist_[cur_][dist_[cur_][targets_.front()].first].second;
-            timeForFree_ -= timeToNext_;
+            if (cur_ == targets_.front()) {
+                res.push_back(new LetterMovingEvent(!free_, cur_, time_));
+                targets_.pop();
+            }
+            if (!targets_.empty()) {
+                timeToNext_ =
+                    dist_[cur_][dist_[cur_][targets_.front()].first].second;
+                timeForFree_ -= timeToNext_;
+            }
         } else {
             timeToNext_ -= step;
             if (free_) freeTime_ += step;
             totalTime_ += step;
+            time_ += step;
             step = 0;
             std::cout << "Time to next branch: " << timeToNext_ << std::endl;
         }

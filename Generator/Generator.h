@@ -5,8 +5,8 @@
 #ifndef COURIER_SERVICE_MODELING_GENERATOR_H
 #define COURIER_SERVICE_MODELING_GENERATOR_H
 
-#include <tuple>
 #include <random>
+#include <tuple>
 
 struct Request {
     int time;
@@ -15,11 +15,12 @@ struct Request {
 };
 
 class Generator {
-public:
-    Generator(int branchCount);
+   public:
+    Generator(int branchCount, std::vector<int> sz);
 
     Request getRequest();
-private:
+
+   private:
     std::random_device rd_;
     std::mt19937 gen_;
     std::normal_distribution<long double> d_;
@@ -30,4 +31,4 @@ private:
 
 bool operator<(const Request& lhs, const Request& rhs);
 
-#endif //COURIER_SERVICE_MODELING_GENERATOR_H
+#endif  // COURIER_SERVICE_MODELING_GENERATOR_H

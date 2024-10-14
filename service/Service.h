@@ -12,13 +12,14 @@
 #include "vector"
 
 struct Statistics {
-  int totalFreeTime;
-  long double averageTimeInWork;
+    int totalFreeTime;
+    long double averageTimeInWork;
 };
 
 class Service {
-public:
-    Service(int branchCount, int courierCount, std::vector<std::vector<int>> matrix);
+   public:
+    Service(int branchCount, int courierCount,
+            std::vector<std::vector<int>> matrix, std::vector<int> sz);
 
     ~Service();
 
@@ -26,9 +27,9 @@ public:
 
     std::vector<Courier *> getCouriers();
 
-    void nextStep(int step);
+    std::vector<Event *> nextStep(int step);
 
-private:
+   private:
     int branchCount_, courierCount_;
     int Time_ = 540;
     Generator generator_;
@@ -37,9 +38,10 @@ private:
     std::vector<Courier *> couriers_;
     std::vector<Branch *> branches_;
     std::vector<Request> requests_;
+    std::vector<int> sz_;
 
     void floyd();
     Statistics getStatistics();
 };
 
-#endif //COURIER_SERVICE_MODELING_SERVICE_H
+#endif  // COURIER_SERVICE_MODELING_SERVICE_H
