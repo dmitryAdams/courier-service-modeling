@@ -18,7 +18,7 @@ struct Stat {
 
 class Service {
 public:
-    Service(int branchCount, int courierCount, std::vector<std::vector<int>> matrix);
+    Service(int branchCount, int courierCount, std::vector<std::vector<int>> matrix, std::vector<int> sz);
 
     ~Service();
 
@@ -26,7 +26,7 @@ public:
 
     std::vector<Courier *> getCouriers();
 
-    std::vector<Event> nextStep(int step);
+    std::vector<AbstractEvent *> nextStep(int step);
 
     Stat getStat();
 
@@ -39,8 +39,11 @@ private:
     std::vector<Courier *> couriers_;
     std::vector<Branch *> branches_;
     std::vector<Request> requests_;
-
+    int way_;
     void floyd();
+    int getCourierId1(int fromId);
+    int getCourierId2();
+    int getCourierId3(int fromId, int toId);
 };
 
 #endif //COURIER_SERVICE_MODELING_SERVICE_H

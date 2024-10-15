@@ -5,13 +5,18 @@
 #ifndef COURIER_SERVICE_MODELING_BRANCH_H
 #define COURIER_SERVICE_MODELING_BRANCH_H
 
+#include <vector>
+
 class Branch {
 public:
-    Branch(int id) : id_(id) {}
-    int getId() { return id_; }
+    Branch(int id);
+    int getId();
+    void addId(int id);
+    std::vector<int> getIdVec();
 
 private:
     int id_;
+    std::vector<int> requestsId_;
 };
 
 

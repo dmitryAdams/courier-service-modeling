@@ -3,3 +3,11 @@
 //
 
 #include "LastEvent.h"
+
+std::string LastEvent::messageOfEvent() {
+    return "===End of modeling===";
+}
+
+bool LastEvent::isLastEvent() {
+    return true;
+}

@@ -16,7 +16,7 @@ struct Request {
 
 class Generator {
 public:
-    Generator(int branchCount);
+    Generator(int branchCount, std::vector<int> sz);
 
     Request getRequest();
 private:
@@ -24,6 +24,7 @@ private:
     std::mt19937 gen_;
     std::normal_distribution<long double> d_;
     std::vector<int> chose_;
+    std::vector<int> sz;
 
     int getTime();
 };

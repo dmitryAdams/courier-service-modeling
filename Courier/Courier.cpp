@@ -5,6 +5,9 @@
 #include "Courier.h"
 
 #include <iostream>
+#include <algorithm>
+#include "../Events//OfficeVisitEvent/OfficeVisitEvent.h"
+#include "../Events/LetterMovingEvent/LetterMovingEvent.h"
 
 bool Courier::isOnTheWay() const { return !targets_.empty(); }
 
@@ -44,47 +47,57 @@ void Courier::setWay(int from, int to) {
     } else {
         timeForFree_ += dist_[targets_.back()][from].second;
     }
+    branches_[from - 1]->addId(from);
     targets_.push(from);
     timeForFree_ += dist_[from][to].second;
     targets_.push(to);
+    ends_.push_back(to);
 }
 
-std::vector<Event> Courier::next(int step) {
-    curTime_ += step;
-    std::cout << id_ << " on " << cur_ << std::endl;
-    std::vector<Event> visited;
-    if (targets_.empty()) {
-        std::cout << "No targets" << std::endl;
-        return visited;
-    }
+std::vector<AbstractEvent *> Courier::next(int step) {
+    if (targets_.empty()) return {};
+    std::vector<AbstractEvent *> res;
     while (!targets_.empty() && step > 0) {
-        if (timeToNext_ == dist_[cur_][dist_[cur_][targets_.front()].first].second) {
-            visited.push_back({id_, 1, cur_, curTime_ - step});
+        if (timeToNext_ ==
+            dist_[cur_][dist_[cur_][targets_.front()].first].second) {
+            res.push_back(new OfficeVisitEvent(0, cur_, curTime_));
+            for (int branchId: branches_[cur_]->getIdVec()) {
+                res.push_back(new LetterMovingEvent(1, cur_, curTime_));
+                ends_.push_back(branchId);
+                targets_.push(branchId);
+                ++weight_;
+            }
         }
         if (timeToNext_ <= step) {
-            std::cout << id_ << " going to next target " << targets_.front() << " throw " <<
-                      dist_[cur_][targets_.front()].first << std::endl;
+            curTime_ += timeToNext_;
             cur_ = dist_[cur_][targets_.front()].first;
-            if (free_) freeTime_ += timeToNext_;
+            res.push_back(new OfficeVisitEvent(1, cur_, curTime_));
+            for (int i = 0; i < std::count(ends_.begin(), ends_.end(), cur_); ++i) {
+                res.push_back(new LetterMovingEvent(0, cur_, curTime_));
+                --weight_;
+            }
+            std::remove(ends_.begin(), ends_.end(), cur_);
+            if (weight_ == 0) freeTime_ += timeToNext_;
             totalTime_ += timeToNext_;
-            free_ = !free_;
             step -= timeToNext_;
-            visited.push_back({id_, 0, cur_, curTime_ - step});
             timeForFree_ -= timeToNext_;
             timeToNext_ = 0;
-            if (cur_ == targets_.front()) targets_.pop();
-            if (!targets_.empty()) timeToNext_ = dist_[cur_][dist_[cur_][targets_.front()].first].second;
-            timeForFree_ -= timeToNext_;
+            if (cur_ == targets_.front()) {
+                targets_.pop();
+            }
+            if (!targets_.empty()) {
+                timeToNext_ =
+                        dist_[cur_][dist_[cur_][targets_.front()].first].second;
+                timeForFree_ -= timeToNext_;
+            }
         } else {
             timeToNext_ -= step;
-            if (free_) freeTime_ += step;
+            if (weight_ == 0) freeTime_ += step;
             totalTime_ += step;
+            curTime_ += step;
             step = 0;
-            std::cout << "Time to next branch: " << timeToNext_ << std::endl;
         }
     }
-    std::cout << id_ << " on " << cur_ << std::endl;
-    return visited;
 }
 
 void Courier::clearTargets() {

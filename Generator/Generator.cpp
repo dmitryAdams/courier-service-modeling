@@ -11,11 +11,10 @@ bool operator<(const Request& lhs, const Request& rhs) {
     return lhs.time < rhs.time;
 }
 
-Generator::Generator(int branchCount) : gen_(rd_()), d_(810, 75) {
+Generator::Generator(int branchCount, std::vector<int> sz) : gen_(rd_()), d_(810, 75) {
     srand(time(0));
     for (int i = 1; i <= branchCount; ++i) {
-        int cnt = rand() % 10;
-        for (int j = 0; j < cnt; ++j) chose_.push_back(i);
+        for (int j = 0; j < sz[i]; ++j) chose_.push_back(i);
     }
 }
 

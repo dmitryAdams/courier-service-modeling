@@ -6,14 +6,16 @@
 #include <algorithm>
 #include <iostream>
 
+#include "../Events/LastEvent/LastEvent.h"
+
 Service::Service(int branchCount, int courierCount,
-                 std::vector<std::vector<int>> matrix)
+                 std::vector<std::vector<int>> matrix, std::vector<int> sz)
         : branchCount_(branchCount),
           courierCount_(courierCount),
           matrix_(std::move(matrix)),
           branches_(branchCount_),
           couriers_(courierCount_),
-          generator_(branchCount_),
+          generator_(branchCount_, std::move(sz)),
           dist_(branchCount_ + 1, std::vector<std::pair<int, int>>(branchCount_ + 1, {-1, 1e9})) {
     // Graph initialization
     for (int i = 1; i <= branchCount_; ++i)
@@ -29,7 +31,7 @@ Service::Service(int branchCount, int courierCount,
     // Couriers initialization
     for (int i = 0; i < courierCount_; ++i)
         couriers_[i] =
-                new Courier(dist_, branches_[i % branchCount_]->getId(), i + 1);
+                new Courier(dist_, branches_, branches_[i % branchCount_]->getId(), i + 1);
 
     // Requests generation
     requests_.resize(50);
@@ -42,19 +44,19 @@ Service::~Service() {
     for (Branch *branch: branches_) delete branch;
 }
 
-std::vector<Event> Service::nextStep(int step) {
+std::vector<AbstractEvent *> Service::nextStep(int step) {
     if (requests_.empty()) {
-        for (Courier* courier : couriers_) courier->clearTargets();
-        return std::vector<Event>(1, {0, 0, 1000, 0});
+        for (Courier *courier: couriers_) courier->clearTargets();
+        return {new LastEvent()};
     }
     Time_ += step;
-    std::vector<Event> res;
+    std::vector<AbstractEvent *> res;
     while (!requests_.empty() && requests_.back().time <= Time_) {
         if (requests_.back().time + step <= 1080) getRequest(requests_.back().from, requests_.back().to);
         requests_.pop_back();
     }
     for (Courier *courier: couriers_) {
-        std::vector<Event> courierEvents = courier->next(step);
+        std::vector<AbstractEvent *> courierEvents = courier->next(step);
         res.insert(res.end(), courierEvents.begin(), courierEvents.end());
     }
     return res;
@@ -70,22 +72,22 @@ void Service::floyd() {
 }
 
 void Service::getRequest(int fromId, int toId) {
-    int id = -1;
-    int dist = 1e9;
-    for (Courier *courier: couriers_) {
-        if (courier->timeForFree() + dist_[courier->getLast()][fromId].second < dist) {
-            id = courier->getId();
-            dist = courier->timeForFree() + dist_[courier->getLast()][fromId].second;
-        }
+    int id;
+    switch (way_) {
+        case 1: id = getCourierId1(fromId); break;
+        case 2: id = getCourierId2(); break;
+        case 3: id = getCourierId3(fromId, toId);
     }
-    couriers_[id - 1]->setWay(fromId, toId);
+    if (id != 1) {
+        couriers_[id - 1]->setWay(fromId, toId);
+    }
 }
 
 Stat Service::getStat() {
     Stat res;
     double totalTimeSum = 0;
     res.totalFreeTime = 0;
-    for (Courier* courier : couriers_) {
+    for (Courier *courier: couriers_) {
         totalTimeSum += courier->getTotalTime();
         res.totalFreeTime += courier->getTotalFreeTime();
     }
@@ -95,4 +97,33 @@ Stat Service::getStat() {
 
 std::vector<Courier *> Service::getCouriers() {
     return couriers_;
+}
+
+int Service::getCourierId1(int fromId) {
+    int id = -1;
+    int dist = 1e9;
+    for (Courier *courier: couriers_) {
+        if (courier->timeForFree() + dist_[courier->getLast()][fromId].second < dist) {
+            id = courier->getId();
+            dist = courier->timeForFree() + dist_[courier->getLast()][fromId].second;
+        }
+    }
+    return id;
+}
+
+int Service::getCourierId2() {
+    return 1 + rand() % courierCount_;
+}
+
+int Service::getCourierId3(int fromId, int toId) {
+    int d = 1e9;
+    int id = -1;
+    for (Courier* courier:couriers_) {
+        if (courier->timeForFree() == 0 && dist_[courier->getLast()][fromId].second < d) {
+            d = dist_[courier->getLast()][fromId].second;
+            id = courier->getId();
+        }
+    }
+    if (id == -1) {branches_[fromId - 1]->addId(toId)};
+    return id;
 }

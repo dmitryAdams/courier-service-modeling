@@ -10,12 +10,8 @@
 class LastEvent : public AbstractEvent {
  public:
   LastEvent() = default;
-  std::string messageOfEvent() override {
-    return "===End of modeling===";
-  }
-  bool isLastEvent() override {
-    return true;
-  }
+  std::string messageOfEvent() override;
+  bool isLastEvent() override;
 };
 
 #endif //COURIER_SERVICE_MODELING_EVENTS_LASTEVENT_LASTEVENT_H_
