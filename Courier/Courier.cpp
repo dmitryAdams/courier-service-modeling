@@ -4,10 +4,11 @@
 
 #include "Courier.h"
 
-#include <iostream>
 #include <algorithm>
-#include "../Events//OfficeVisitEvent/OfficeVisitEvent.h"
+#include <iostream>
+
 #include "../Events/LetterMovingEvent/LetterMovingEvent.h"
+#include "../Events/OfficeVisitEvent/OfficeVisitEvent.h"
 
 bool Courier::isOnTheWay() const { return !targets_.empty(); }
 
@@ -17,9 +18,7 @@ int Courier::getTotalTime() const { return totalTime_; }
 
 int Courier::getTotalFreeTime() const { return freeTime_; }
 
-int Courier::getNextTime() const {
-    return timeToNext_;
-}
+int Courier::getNextTime() const { return timeToNext_; }
 
 int Courier::goingTo() const {
     if (targets_.empty()) return cur_;
@@ -61,7 +60,7 @@ std::vector<AbstractEvent *> Courier::next(int step) {
         if (timeToNext_ ==
             dist_[cur_][dist_[cur_][targets_.front()].first].second) {
             res.push_back(new OfficeVisitEvent(0, cur_, curTime_));
-            for (int branchId: branches_[cur_]->getIdVec()) {
+            for (int branchId : branches_[cur_]->getIdVec()) {
                 res.push_back(new LetterMovingEvent(1, cur_, curTime_));
                 ends_.push_back(branchId);
                 targets_.push(branchId);
@@ -72,7 +71,8 @@ std::vector<AbstractEvent *> Courier::next(int step) {
             curTime_ += timeToNext_;
             cur_ = dist_[cur_][targets_.front()].first;
             res.push_back(new OfficeVisitEvent(1, cur_, curTime_));
-            for (int i = 0; i < std::count(ends_.begin(), ends_.end(), cur_); ++i) {
+            for (int i = 0; i < std::count(ends_.begin(), ends_.end(), cur_);
+                 ++i) {
                 res.push_back(new LetterMovingEvent(0, cur_, curTime_));
                 --weight_;
             }
@@ -87,7 +87,7 @@ std::vector<AbstractEvent *> Courier::next(int step) {
             }
             if (!targets_.empty()) {
                 timeToNext_ =
-                        dist_[cur_][dist_[cur_][targets_.front()].first].second;
+                    dist_[cur_][dist_[cur_][targets_.front()].first].second;
                 timeForFree_ -= timeToNext_;
             }
         } else {
@@ -98,6 +98,7 @@ std::vector<AbstractEvent *> Courier::next(int step) {
             step = 0;
         }
     }
+    return res;
 }
 
 void Courier::clearTargets() {

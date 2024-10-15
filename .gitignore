@@ -1,2 +1,3 @@
-CMakeLists.txt
-main.cpp
+build
+.vscode
+.editorconfig

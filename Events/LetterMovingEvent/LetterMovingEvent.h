@@ -8,16 +8,15 @@
 #include "../AbstacstEvent/AbsractEvent.h"
 
 class LetterMovingEvent : public AbstractEvent {
-public:
+   public:
     std::string messageOfEvent() override;
     LetterMovingEvent(int isTaken, int officeId, int time);
     bool isLastEvent() override;
 
-private:
+   private:
     bool isTaken_;
     int officeId_;
     int time_;
 };
 
-
-#endif //COURIER_SERVICE_MODELING_LETTERMOVINGEVENT_H
+#endif  // COURIER_SERVICE_MODELING_LETTERMOVINGEVENT_H
