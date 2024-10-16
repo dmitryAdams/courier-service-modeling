@@ -117,13 +117,13 @@ void MainDispetcherWindow::start_button_clicked_() {
             timer_->stop();
         } else {
             delete dispetcher_service_;
-            std::cout << "Введите размеры каждого офиса" << std::endl;
-            std::vector<int> officeSz(office_counter_ + 1);
-            for (int i = 1; i <= office_counter_; ++i) {
-                std::cin >> officeSz[i];
-            }
+//            std::cout << "Введите размеры каждого офиса" << std::endl;
+//            std::vector<int> officeSz(office_counter_ + 1);
+//            for (int i = 1; i <= office_counter_; ++i) {
+//                std::cin >> officeSz[i];
+//            }
             dispetcher_service_ = new Service(office_counter_, courier_counter_,
-                                              matrix_, officeSz);
+                                              matrix_, priority_);
             auto couriers = dispetcher_service_->getCouriers();
             for (int i = 0; i < courier_counter_; ++i) {
                 prev_from_for_courier_[i] = couriers[i]->comingFrom();
