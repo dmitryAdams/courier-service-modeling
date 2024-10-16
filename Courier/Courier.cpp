@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include "../Events/LetterMovingEvent/LetterMovingEvent.h"
 #include "../Events/OfficeVisitEvent/OfficeVisitEvent.h"
@@ -45,12 +46,11 @@ void Courier::setWay(int from, int to) {
         timeForFree_ = dist_[cur_][from].second - timeToNext_;
     } else {
         timeForFree_ += dist_[targets_.back()][from].second;
+        timeForFree_ += dist_[from][to].second;
     }
-    branches_[from - 1]->addId(from);
+    branches_[from - 1]->addId(to);
     targets_.push(from);
-    timeForFree_ += dist_[from][to].second;
     targets_.push(to);
-    ends_.push_back(to);
 }
 
 std::vector<AbstractEvent *> Courier::next(int step) {
@@ -60,7 +60,7 @@ std::vector<AbstractEvent *> Courier::next(int step) {
         if (timeToNext_ ==
             dist_[cur_][dist_[cur_][targets_.front()].first].second) {
             res.push_back(new OfficeVisitEvent(0, cur_, curTime_));
-            for (int branchId : branches_[cur_]->getIdVec()) {
+            for (int branchId : branches_[cur_ - 1]->getIdVec()) {
                 res.push_back(new LetterMovingEvent(1, cur_, curTime_));
                 ends_.push_back(branchId);
                 targets_.push(branchId);
@@ -76,7 +76,8 @@ std::vector<AbstractEvent *> Courier::next(int step) {
                 res.push_back(new LetterMovingEvent(0, cur_, curTime_));
                 --weight_;
             }
-            std::remove(ends_.begin(), ends_.end(), cur_);
+            ends_.erase(ends_.begin(),
+                        std::remove(ends_.begin(), ends_.end(), cur_));
             if (weight_ == 0) freeTime_ += timeToNext_;
             totalTime_ += timeToNext_;
             step -= timeToNext_;

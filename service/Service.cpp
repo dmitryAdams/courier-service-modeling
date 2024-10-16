@@ -18,7 +18,8 @@ Service::Service(int branchCount, int courierCount,
       couriers_(courierCount_),
       generator_(branchCount_, std::move(sz)),
       dist_(branchCount_ + 1,
-            std::vector<std::pair<int, int>>(branchCount_ + 1, {-1, 1e9})) {
+            std::vector<std::pair<int, int>>(branchCount_ + 1, {-1, 1e9})),
+      way_(3) {
     // Graph initialization
     for (int i = 1; i <= branchCount_; ++i)
         for (int j = 1; j <= branchCount_; ++j)
@@ -87,7 +88,7 @@ void Service::getRequest(int fromId, int toId) {
         case 3:
             id = getCourierId3(fromId, toId);
     }
-    if (id != 1) {
+    if (id != -1) {
         couriers_[id - 1]->setWay(fromId, toId);
     }
 }

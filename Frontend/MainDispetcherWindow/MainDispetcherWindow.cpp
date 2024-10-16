@@ -117,11 +117,6 @@ void MainDispetcherWindow::start_button_clicked_() {
             timer_->stop();
         } else {
             delete dispetcher_service_;
-//            std::cout << "Введите размеры каждого офиса" << std::endl;
-//            std::vector<int> officeSz(office_counter_ + 1);
-//            for (int i = 1; i <= office_counter_; ++i) {
-//                std::cin >> officeSz[i];
-//            }
             dispetcher_service_ = new Service(office_counter_, courier_counter_,
                                               matrix_, priority_);
             auto couriers = dispetcher_service_->getCouriers();
@@ -326,10 +321,11 @@ void MainDispetcherWindow::make_step() {
             auto statistic = dispetcher_service_->getStat();
             QMessageBox::information(
                 this, "Статистика",
-                "Общая длительность переехдов: " +
+                "Среднее время в пути: " +
                     QString::number(statistic.averageTime) +
                     "\nОбщее время простоя: " +
                     QString::number(statistic.totalFreeTime));
         }
+        delete message;
     }
 }
