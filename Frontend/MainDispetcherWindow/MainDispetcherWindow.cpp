@@ -216,7 +216,7 @@ void MainDispetcherWindow::change_company_size() {
 
     matrix_.assign(office_counter_ + 1,
                    std::vector<int>(office_counter_ + 1, 60));
-    priority_.assign(office_counter_, -1);
+    priority_.assign(office_counter_, 1);
 
     delete set_time_window_;
     set_time_window_ =
