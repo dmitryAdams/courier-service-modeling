@@ -36,12 +36,12 @@ void OfficePriorityWindow::accept_button_clicked_() {
         break;
       }
     }
-    full_ok = full_ok && ok;
+    full_ok = full_ok && ok && priorities[i] <= 1000;
   }
   if (full_ok) {
     hide();
-//    emit data_entered_correctly(priorities);
+    emit data_entered_correctly(priorities);
   } else {
-    QMessageBox::critical(this, "Ошибка", "приоритет может быть только натуральным числом!");
+    QMessageBox::critical(this, "Ошибка", "приоритет может быть только натуральным числом! не больше 1000");
   }
 }
