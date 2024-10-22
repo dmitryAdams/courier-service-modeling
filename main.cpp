@@ -1,3 +1,4 @@
+// #define _GLIBCXX_DEBUG 1
 #include "./Frontend/MainDispetcherWindow/MainDispetcherWindow.h"
 #include "QApplication"
 
