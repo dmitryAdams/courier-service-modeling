@@ -69,6 +69,7 @@ std::vector<AbstractEvent *> Courier::next(int step) {
         }
         if (timeToNext_ <= step) {
             curTime_ += timeToNext_;
+            if (weight_ == 0) freeTime_ += timeToNext_;
             cur_ = dist_[cur_][targets_.front()].first;
             res.push_back(new OfficeVisitEvent(1, cur_, curTime_));
             for (int i = 0; i < std::count(ends_.begin(), ends_.end(), cur_);
@@ -78,7 +79,6 @@ std::vector<AbstractEvent *> Courier::next(int step) {
             }
             ends_.erase(ends_.begin(),
                         std::remove(ends_.begin(), ends_.end(), cur_));
-            if (weight_ == 0) freeTime_ += timeToNext_;
             totalTime_ += timeToNext_;
             step -= timeToNext_;
             timeForFree_ -= timeToNext_;
