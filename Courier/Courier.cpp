@@ -67,6 +67,7 @@ std::vector<AbstractEvent *> Courier::next(int step) {
                 ++weight_;
             }
         }
+
         if (timeToNext_ <= step) {
             curTime_ += timeToNext_;
             cur_ = dist_[cur_][targets_.front()].first;
